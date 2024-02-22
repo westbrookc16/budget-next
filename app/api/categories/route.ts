@@ -4,8 +4,10 @@ export const POST = async (request) => {
   const budgetId = data.get("budgetId");
 
   const name = data.get("name");
-  const amount = parseFloat(data.get("amount"));
-  const isRecurring = data.get("isRecurring") === "on" ? true : false;
+  const amount = parseFloat(
+    data.get("amount").replace("$", "").replace(",", "")
+  );
+  const isRecurring = data.get("isRecurring") === "true" ? true : false;
   const id = data.get("id");
 
   try {

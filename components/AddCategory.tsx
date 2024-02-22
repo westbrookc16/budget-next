@@ -1,4 +1,6 @@
 'use client';
+import { Input,NumericTextBox } from '@progress/kendo-react-inputs';
+import { Checkbox } from "@progress/kendo-react-inputs";
 import {useState,useEffect} from "react";
 export default function({budgetId,category,mode}){
 const [categoryState,setCategory]=useState(category);
@@ -12,17 +14,18 @@ return {...c,[name]:value};
 }
 const {name,isRecurring,amount,id}=categoryState;    
 if (modeState==="add"){
+
 return(<div>
 <h1>Add Category</h1>
 
 <form method="post" action="/api/categories">
 
-    <label htmlFor="name">Name</label>
-<input type="text" id="name" value={name} onChange={handleChange} name="name"/>
-<label htmlFor="amount">Amount</label>
-<input type="numberf" id="amount" value={amount} onChange={handleChange} name="amount"/>
-<label htmlFor="isRecurring">Is Recurring</label>
-<input type="checkbox" id="isRecurring" checked={isRecurring} onChange={handleChange} name="isRecurring"/>
+    
+<Input type="text" id="name" value={name} onChange={handleChange} name="name" label='Name'/>
+
+<NumericTextBox format="c2" id="amount" value={amount} onChange={handleChange} name="amount" label="Amount"/>
+
+<Checkbox id="isRecurring" checked={isRecurring} onChange={handleChange} name="isRecurring" label="Is Recurring"/>
 <input type="hidden" name="budgetId" value={budgetId}/>
 <input type="submit" value="add"/>
 </form>

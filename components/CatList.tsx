@@ -19,8 +19,8 @@ fetchData();
 
 },[budgetID]);
 const trs=cats.map((cat)=>{
-    console.log(`name=${cat.name}`);
-        return <AddCategory mode="readonly" category={cat} budgetId={budgetID}/>
+    
+        return <AddCategory mode="readonly" category={cat} budgetId={budgetID} key={cat.id}/>
     });
     
 return(<div>
