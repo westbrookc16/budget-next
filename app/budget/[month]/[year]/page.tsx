@@ -1,23 +1,46 @@
 'use client';
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
+import { DropDownList } from "@progress/kendo-react-dropdowns";
 import { useEffect, useState } from "react";
 import AddCategory from "@/components/AddCategory";
 import CatList from "@/components/CatList";
+import { Form, Field, FormElement } from '@progress/kendo-react-form';
+import { Error } from '@progress/kendo-react-labels';
+import { Input,NumericTextBox } from '@progress/kendo-react-inputs';
 export default function HandleBudgetPage(){
 const router=useRouter();
 const {month, year}=useParams();
     const [budget,setBudget]=useState({year:'2024',month:'1',income:0,id:''});
+    const [realMonth,setRealMonth]=useState(month);
     const [loading,setLoading]=useState(true);
-    const [ddlMonth,setDdlMonth]=useState(month);
+    const months=[
+        
+        {name:'Jan',value:1},
+        {name:'Feb',value:2},
+        {name:'Mar',value:3},
+        {name:'Apr',value:4},
+        {name:'May',value:5},
+        {name:'Jun',value:6},
+        {name:'Jul',value:7},
+        {name:'Aug',value:8},
+        {name:'Sep',value:9},
+        {name:'Oct',value:10},
+        {name:'Nov',value:11},
+        {name:'Dec',value:12}
+    ];
+    const [ddlMonth,setDdlMonth]=useState(months.filter((v)=>v.value===parseInt(month))[0]);
+
     const [ddlYear,setDdlYear]=useState(year);
+    
+    
     const changeBudget=(e:any)=>{
 if (e.target.name==="month"){
-setDdlMonth(e.target.value);
-router.push(`/budget/${e.target.value}/${ddlYear}`);
+setRealMonth(e.target.value.value);
+router.push(`/budget/${e.target.value.value}/${ddlYear}`);
 }
 else{
-setDdlYear(e.target.value);
+setDdlYear(e.target.value); 
 router.push(`/budget/${ddlMonth}/${e.target.value}`);
 }
     };
@@ -29,7 +52,7 @@ router.push(`/budget/${ddlMonth}/${e.target.value}`);
         setLoading(false);
 }
 fetchData();
-console.log(budget);
+
     },[month,year]);
     if (loading){
 return (<div role="status">loading...</div>);
@@ -38,35 +61,23 @@ return (<div role="status">loading...</div>);
     return (<div>
     <h1>Budget </h1>
     <form method="post" action="/api/budget">
-    <label htmlFor="ddlMonth">Month</label>
-    <select id="ddlMonth" name="month" value={ddlMonth} onChange={changeBudget}>
-<option value="1">Jan</option>
-<option value="2">Feb</option>
-<option value="3">Mar</option>
-<option value="4">Apr</option>
-<option value="5">May</option>
-<option value="6">Jun</option>
-<option value="7">Jul</option>
-<option value="8">Aug</option>
-<option value="9">Sep</option>
-<option value="10">Oct</option>
-<option value="11">Nov</option>
-<option value="12">Dec</option>
-    </select>
-    <label htmlFor="ddlYear">Year</label>
-    <select id="ddlYear" onChange={changeBudget} name="year" value={ddlYear}>
+    
+    <DropDownList id="ddlMonth" name="month" value={ddlMonth} onChange={changeBudget} data={months} textField="name" dataItemKey="value" label="Month" />
+    
+    <input type="hidden" id="realMonth" name="realMonth" value={realMonth}/>
+    
+    
+    
+    <DropDownList id="ddlYear" name="year" data={['2024','2025','2026']} value={ddlYear} onChange={changeBudget} label="Year"/>
+    
+    <NumericTextBox id="income" format="c2" name="income" value={budget.income} onChange={e=>{
 
-        <option>2024</option>
-        <option>2025</option>
-    </select>
-    <label htmlFor="income">Income</label>
-    <input id="income" name="income" value={budget.income} onChange={e=>{
 setBudget(b=>{
-return{...b,income:parseFloat(e.target.value)};
+return{...b,income:e.value};
 
 })
 
-    }}></input>
+    }} label="Income"/>
     <input type="hidden" name="budgetId" value={budget.id}/>
     <input type="submit" value="submit"/>
  

@@ -1,11 +1,15 @@
 import { getSessionUser } from "@/utils/getSessionUser";
 import prisma from "@/utils/prisma";
-import { json } from "stream/consumers";
+
 export const POST = async (request: any) => {
   const data = await request.formData();
-  const month = parseInt(data.get("month"));
+  console.log(`year=${data.get("year")}`);
+  const month = parseInt(data.get("realMonth"));
   const year = parseInt(data.get("year"));
-  const income = parseFloat(data.get("income"));
+
+  const income = parseFloat(
+    data.get("income").replace("$", "").replace(",", "")
+  );
   const user = await getSessionUser();
   if (!user) {
     console.log(`no user`);

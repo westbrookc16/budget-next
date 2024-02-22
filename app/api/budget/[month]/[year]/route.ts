@@ -3,7 +3,7 @@ import prisma from "@/utils/prisma";
 export async function GET(request, { params }) {
   const { month, year } = params;
   const user = await getSessionUser();
-  //const prisma = new PrismaClient();
+
   if (!user) {
     return new Response(`{ msg: "no user" }`, { status: 500 });
   }
