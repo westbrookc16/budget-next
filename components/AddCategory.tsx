@@ -2,7 +2,7 @@
 import { Input, NumericTextBox } from "@progress/kendo-react-inputs";
 import { Checkbox } from "@progress/kendo-react-inputs";
 import { useState, useEffect } from "react";
-export default function ({ budgetId, category, mode, focusRef }) {
+export default function AddCategory({ budgetId, category, mode, focusRef }) {
   const [categoryState, setCategory] = useState(category);
   const [modeState, setModeState] = useState(mode);
   const handleChange = (e) => {

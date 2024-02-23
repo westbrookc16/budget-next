@@ -4,7 +4,7 @@ import { useEffect,useRef,useState } from "react";
 import AddCategory from "./AddCategory";
 import { Grid, GridColumn as Column, GridCellProps } from "@progress/kendo-react-grid";
 import { Checkbox } from "@progress/kendo-react-inputs";
-export default function({budgetID}){
+export default function CatList({budgetID}){
 
 const [cats,setCats]=useState([]);    
 const focusRef=useRef(null);
