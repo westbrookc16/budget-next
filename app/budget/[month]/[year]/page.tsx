@@ -8,6 +8,7 @@ import CatList from "@/components/CatList";
 import { Form, Field, FormElement } from '@progress/kendo-react-form';
 import { Error } from '@progress/kendo-react-labels';
 import { Input,NumericTextBox } from '@progress/kendo-react-inputs';
+import { Dialog } from "@progress/kendo-react-dialogs";
 export default function HandleBudgetPage(){
 const router=useRouter();
 const {month, year}=useParams();
@@ -44,6 +45,7 @@ setDdlYear(e.target.value);
 router.push(`/budget/${ddlMonth}/${e.target.value}`);
 }
     };
+    const [addCat,setAddCat]=useState<boolean>(false);
     useEffect(()=>{
     async function fetchData(){
         const res =await fetch(`/api/budget/${month}/${year}`);
@@ -58,6 +60,7 @@ fetchData();
 return (<div role="status">loading...</div>);
 
     }
+    
     return (<div>
     <h1>Budget </h1>
     <form method="post" action="/api/budget">
@@ -83,7 +86,13 @@ return{...b,income:e.value};
  
 </form>
 <CatList budgetID={budget.id}/>
-<AddCategory budgetId={budget.id} category={{name:'',amount:0,isRecurring:false,id:''}} mode="add"/>   
+<button onClick={e=>{
+setAddCat(true);
+
+}}>Add Category</button>
+{addCat&&<Dialog title="Add Category" onClose={e=>{setAddCat(false);}}>
+<AddCategory budgetId={budget.id} category={{name:'',amount:0,isRecurring:false,id:''}} mode="Add"/>   
+</Dialog>}
     </div>);
 
 }
