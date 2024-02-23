@@ -1,9 +1,13 @@
 'use client';
-import { useEffect,useState } from "react";
+import { Dialog } from '@progress/kendo-react-dialogs';
+import { useEffect,useRef,useState } from "react";
 import AddCategory from "./AddCategory";
+import { Grid, GridColumn as Column, GridCellProps } from "@progress/kendo-react-grid";
+import { Checkbox } from "@progress/kendo-react-inputs";
 export default function({budgetID}){
 
 const [cats,setCats]=useState([]);    
+const focusRef=useRef(null);
 useEffect(()=>{
 async function fetchData(){
 try{
@@ -18,29 +22,39 @@ console.log(e);
 fetchData();
 
 },[budgetID]);
-const trs=cats.map((cat)=>{
+
+    const checkboxCell=(props: GridCellProps) => {
+const isRecurring=props.dataItem[props.field]; 
+return (<td><Checkbox disabled checked={isRecurring}/></td>)
+    }
+const [editCat,setEditCat]=useState({});
+const [isEditing,setIsEditing]=useState(false);
+const editCell=(props:GridCellProps)=>{
+return (<td><button onClick={e=>{
+    setIsEditing(true);
+        setEditCat(props.dataItem);
+        
+
     
-        return <AddCategory mode="readonly" category={cat} budgetId={budgetID} key={cat.id}/>
-    });
-    
+
+}}>Edit</button></td>);
+
+
+}
 return(<div>
 <h1>List of Categories</h1>
-<table>
-<thead>
-<tr>
-<th scope="col">Name</th>
-<th scope="col">Amount</th>
+<Grid data={cats}>
+<Column field="name" title="name"/>
+<Column field="amount" format="{0:c2}" title="amount"/>
+<Column field="isRecurring" title="Is Recurring" cell={checkboxCell}/>
 
-<th scope="col">Is Recurring</th>
-<th scope="col">Edit</th>
-</tr>
+<Column title="Edit" cell={editCell}/>
+</Grid>
+{isEditing&&<Dialog title="Edit Category" onClose={()=>{
+setIsEditing(false);
 
-</thead>
-
-<tbody>
-    {trs}
-    </tbody>
-</table>
-
+}} >
+    <AddCategory mode="Edit" budgetId={budgetID} category={editCat} focusRef={focusRef}/>
+    </Dialog>}
 </div>)
 }
