@@ -22,71 +22,74 @@ const Navbar = () => {
   
     setAuthProviders();
   }, []);
-console.dir(providers);  
-  const SignInButtons=providers.map((provider)=>{return (
-    <button
-      onClick={() => signIn(provider?.id)}
-      className='flex items-center space-x-2 focus:outline-none'
-    >
-      <FaGoogle className='text-red-500' />
-      <span className='text-white font-semibold'>Sign In with {provider.name}</span>
-    </button>
-  );});
+const SignInButtons=()=>{
+if (providers){
+return Object.values(providers).map((provider) => (
+  <button
+  key={provider.id}  
+  onClick={() => signIn(provider?.id)}
+    class='flex items-center space-x-2 focus:outline-none'
+  >
+    <FaGoogle class='text-red-500' />
+    <span class='text-white font-semibold'>Sign In with {provider.name}</span>
+  </button>
+));
+
+}
+
+}
+  
   return (
-    <nav className='bg-blue-700 border-b border-blue-500'>
-      <div className='container mx-auto flex items-center justify-between'>
+    <nav class='bg-blue-700 border-b border-blue-500'>
+      <div class='container mx-auto flex items-center justify-between'>
         <Link href='/'>
-          <a>
+          
             <Image src={logo} alt='logo' width={150} height={50} />
-          </a>
+
         </Link>
-        <div className='hidden md:flex items-center space-x-3'>
-          <Link href='/'>
-            <a className='text-white font-semibold'>Home</a>
+        <div class='hidden md:flex items-center space-x-3'>
+          <Link href='/' className='text-white font-semibold'>
+            Home
           </Link>
-          <Link href='/about'>
-            <a className='text-white font-semibold'>About</a>
-          </Link>
-          <Link href='/contact'>
-            <a className='text-white font-semibold'>Contact</a>
-          </Link>
-          <Link href='/dashboard'>
-            <a className='text-white font-semibold'>Dashboard</a>
-          </Link>
+          
           {session ? (
-            <div className='relative'>
+            <>
+            <div class='relative'>
+              <Link href={`/budget/${new Date().getMonth() + 1}/${new Date().getFullYear()}`} className='text-white>font-semibold'>Budget</Link>
+              
               <button
                 onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                className='flex items-center space-x-2 focus:outline-none'
-              >
+                class='flex items-center space-x-2 focus:outline-none'
+              aria-expanded={isProfileMenuOpen}>
                 <Image
-                  src={session.user.image || profileDefault}
+                  src={profileDefault}
                   alt='profile'
                   width={30}
                   height={30}
-                  className='rounded-full'
+                  class='rounded-full'
                 />
-                <span className='text-white font-semibold'>
+                <span class='text-white font-semibold'>
                   {session.user.name}
                 </span>
               </button>
+              
               {isProfileMenuOpen && (
-                <div className='absolute top-12 right-0 bg-white p-3 shadow-lg rounded-md'>
+                <div class='absolute top-12 right-0 bg-white p-3 shadow-lg rounded-md'>
                   <button
                     onClick={() => signOut()}
-                    className='flex items-center space-x-3 focus:outline-none'
+                    class='flex items-center space-x-3 focus:outline-none'
                   >
-                    <FaGoogle className='text-red-500' />
-                    <span className='text-red-500 font-semibold'>Sign Out</span>
+                    <FaGoogle class='text-red-500' />
+                    <span class='text-red-500 font-semibold'>Sign Out</span>
                   </button>
                 </div>
               )}
             </div>
-          
-          ) : ({SignInButtons})
+          </>
+              ) : (<div><SignInButtons/></div>)
           }
         </div>
-        </div>
+</div>
 </nav>
   );
 };

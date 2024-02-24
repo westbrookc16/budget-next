@@ -11,7 +11,7 @@ export async function updateCategory(initialState: any, data: FormData) {
       return { message: "Your category was deleted successfully." };
     }
     //now do insert or update
-    const isRecurring = data.get("isRecurring") === "true" ? true : false;
+    const isRecurring = data.get("isRecurring") === "on" ? true : false;
     const budgetId = data.get("budgetId");
 
     const name = data.get("name");
@@ -25,7 +25,7 @@ export async function updateCategory(initialState: any, data: FormData) {
         data: { budgetId, isRecurring, amount, name },
       });
     } else {
-      console.log("update");
+      console.log(`isRecurring=${data.get("isRecurring")}`);
       await prisma.categories.update({
         where: { id },
         data: { name, amount, isRecurring },
