@@ -1,19 +1,20 @@
 'use client';
+import { SignInButton, UserButton } from "@clerk/nextjs";
 import { useState,useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import logo from '@/assets/images/logo-white.png';
 import profileDefault from '@/assets/images/profile.png';
 import { FaGoogle } from 'react-icons/fa';
-import { signIn, signOut, useSession, getProviders } from 'next-auth/react';
+import { useUser } from "@clerk/nextjs";
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const { data: session } = useSession();
-  const [providers, setProviders] = useState(null);
   
-  useEffect(() => {
+  const [providers, setProviders] = useState(null);
+    const { isLoaded, isSignedIn, user } = useUser();
+  /*useEffect(() => {
     const setAuthProviders = async () => {
       const res = await getProviders();
   
@@ -37,7 +38,7 @@ return Object.values(providers).map((provider) => (
 
 }
 
-}
+}*/
   
   return (
     <nav class='bg-blue-700 border-b border-blue-500'>
@@ -52,9 +53,10 @@ return Object.values(providers).map((provider) => (
             Home
           </Link>
           
-          {session ? (
+          {isLoaded&&isSignedIn? (
             <>
             <div class='relative'>
+              <UserButton />
               <Link href={`/budget/${new Date().getMonth() + 1}/${new Date().getFullYear()}`} className='text-white>font-semibold'>Budget</Link>
               
               <button
@@ -69,7 +71,7 @@ return Object.values(providers).map((provider) => (
                   class='rounded-full'
                 />
                 <span class='text-white font-semibold'>
-                  {session.user.name}
+                  {user.fullName}
                 </span>
               </button>
               
@@ -86,7 +88,7 @@ return Object.values(providers).map((provider) => (
               )}
             </div>
           </>
-              ) : (<div><SignInButtons/></div>)
+              ) : (<div><SignInButton/></div>)
           }
         </div>
 </div>

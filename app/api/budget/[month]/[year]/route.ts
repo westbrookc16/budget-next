@@ -1,20 +1,21 @@
-import { getSessionUser } from "@/utils/getSessionUser";
+import { auth, currentUser } from "@clerk/nextjs";
 import prisma from "@/utils/prisma";
 export async function GET(request, { params }) {
   const { month, year } = params;
-  const user = await getSessionUser();
+  //get user from clerk
+  const { userId } = auth();
 
-  if (!user) {
+  if (!userId) {
     return new Response(`{ msg: "no user" }`, { status: 500 });
   }
   const budget = await prisma.budgets.findFirst({
     where: {
       month: parseInt(month),
       year: parseInt(year),
-      userId: user.userId,
+      userId: userId,
     },
   });
-  console.log(`userID=${user.userId}`);
+
   return new Response(
     JSON.stringify(!budget ? { year, month, income: 0.0, id: "" } : budget)
   );
