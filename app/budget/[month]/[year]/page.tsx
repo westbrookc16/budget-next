@@ -64,16 +64,13 @@ router.push(`/budget/${ddlMonth}/${e.target.value}`);
     
     const status=useFormStatus();
     
-
-    if (formState.message!==""&&notificationMsg!==formState.message){
+//display notification if formState has changed
+useEffect(()=>{
+    if (formState.message)
         
         setSuccess(true);
-setNotificationMsg(formState.message);
-        setTimeout(() => {
-           setSuccess(false);
-           
-        }, 20000);
-    }
+    },[formState.message]);
+    
     
     
     useEffect(()=>{
@@ -136,13 +133,7 @@ return (<div role="status">loading...</div>);
 <div aria-live="off">
 <CatList budgetID={budget.id}/>
 </div>
-<button onClick={e=>{
-setAddCat(true);
 
-}}>Add Category</button>
-{addCat&&<Dialog title="Add Category" onClose={e=>{setAddCat(false);}}>
-<AddCategory budgetId={budget.id} category={{name:'',amount:0,isRecurring:false,id:''}} mode="Add"/>   
-</Dialog>}
     </div>
     
     );
