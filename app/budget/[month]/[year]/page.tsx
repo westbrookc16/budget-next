@@ -18,13 +18,40 @@ import { Dialog } from "@progress/kendo-react-dialogs";
 
 export default function HandleBudgetPage(){
 const initialState={message:''};
-//const [notification]=useCookies('notification');
+const [budget,setBudget]=useState({year:'2024',month:'1',income:0,id:''});
+const [refreshDate,setRefreshDate]=useState("");
+const [cats,setCats]=useState([]);    
+const totalBudgeted=()=>{let total=0;
+    cats.forEach(cat=>total+=cat.amount);
+    return total;
+    }
+    
+useEffect(()=>{
+async function fetchData(){
+try{
+    const catsRes=await fetch(`/api/categories/${budget.id}`);
+setCats(await catsRes.json());
+}
+catch(e){
+console.log(e);
+
+}
+}
+fetchData();
+
+},[budget.id,refreshDate]);
+const refreshGrid=()=>{
+setRefreshDate(new Date());
+ 
+}
+
+
 
 const [formState,formAction]=useFormState(updateBudget,initialState)
-const [notificationMsg,setNotificationMsg]=useState('');
+
 const router=useRouter();
 const {month, year}=useParams();
-    const [budget,setBudget]=useState({year:'2024',month:'1',income:0,id:''});
+    
     const [realMonth,setRealMonth]=useState(month);
     const [loading,setLoading]=useState(true);
     const months=[
@@ -60,7 +87,7 @@ router.push(`/budget/${ddlMonth}/${e.target.value}`);
     const [addCat,setAddCat]=useState<boolean>(false);
     const [success,setSuccess]=useState(false);
     
-    //display notification
+    
     
     const status=useFormStatus();
     
@@ -69,6 +96,9 @@ useEffect(()=>{
     if (formState.message)
         
         setSuccess(true);
+        setTimeout(() => {
+           setSuccess(false); 
+        }, 5000);
     },[formState.message]);
     
     
@@ -124,16 +154,22 @@ return (<div role="status">loading...</div>);
             }}
                     >
       
-                {notificationMsg}
+                {formState.message}
 
             </Notification>}
         </Fade>
     </NotificationGroup>
     </div>
 <div aria-live="off">
-<CatList budgetID={budget.id}/>
+<CatList budgetID={budget.id} cats={cats} refreshGrid={refreshGrid}/>
 </div>
+<div>Total Budgeted: {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(totalBudgeted())}</div>
+    
+<div>Total Income: {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(budget.income)}</div>
+    <div aria-live="polite">
+There is {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(budget.income-totalBudgeted())} left to budget.
 
+    </div>
     </div>
     
     );

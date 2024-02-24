@@ -61,8 +61,8 @@ closeDialog();
 
           <Checkbox
             id="isRecurring"
-            checked={isRecurring}
-            onChange={handleChange}
+            defaultChecked={isRecurring}
+  onChange={handleChange}           value={isRecurring}
             name="isRecurring"
             label="Is Recurring"
           />

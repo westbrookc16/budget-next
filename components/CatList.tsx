@@ -6,33 +6,16 @@ import { Grid, GridColumn as Column, GridCellProps } from "@progress/kendo-react
 import { Checkbox } from "@progress/kendo-react-inputs";
 import { useFormState } from 'react-dom';
 import { updateCategory } from '@/app/actions/categories';
-export default function CatList({budgetID}){
+export default function CatList({budgetID,cats,refreshGrid}){
 const originalState={message:''};
 const [deleteFormState,deleteAction]=useFormState(updateCategory,originalState);
-//calculate the total amount of the categories
-const totalBudgeted=()=>{let total=0;
-cats.forEach(cat=>total+=cat.amount);
-return total;
-}
 
-const [cats,setCats]=useState([]);    
+
+
 //state for the add category dialog
  const [addCat,setAddCat]=useState(false);
-const [refreshDate,setRefreshDate]=useState("");
-useEffect(()=>{
-async function fetchData(){
-try{
-    const catsRes=await fetch(`/api/categories/${budgetID}`);
-setCats(await catsRes.json());
-}
-catch(e){
-console.log(e);
 
-}
-}
-fetchData();
 
-},[budgetID,refreshDate]);
 
     const checkboxCell=(props: GridCellProps) => {
 const isRecurring=props.dataItem[props.field]; 
@@ -67,10 +50,7 @@ const deleteCell=(props:GridCellProps)=>{
     
     }
     
-const refreshGrid=()=>{
-setRefreshDate(new Date());
- 
-}
+
 
 const closeDialog=()=>{
     setIsEditing(false);
@@ -120,6 +100,6 @@ setAddCat(true);
 {addCat&&<Dialog title="Add Category" onClose={e=>{setAddCat(false);}}>
 <AddCategory budgetId={budgetID} category={{name:'',amount:0,isRecurring:false,id:''}} mode="Add" refresh={refreshGrid} closeDialog={()=>{setAddCat(false);}}/>   
 </Dialog>}
-<div aria-live='polite'>Total Budgeted: {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(totalBudgeted())}</div>
+
 </div>)
 }
