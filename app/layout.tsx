@@ -1,3 +1,4 @@
+
 import Navbar from "@/components/Navbar";
 import AuthProvider from "@/components/AuthProvider";
 import type { Metadata } from "next";
@@ -18,6 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    
     <AuthProvider>
     <html lang="en">
       <body className={inter.className}>
@@ -25,5 +27,6 @@ export default function RootLayout({
         {children}</body>
     </html>
     </AuthProvider>
+    
   );
 }

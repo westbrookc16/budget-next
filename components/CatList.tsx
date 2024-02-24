@@ -8,6 +8,7 @@ export default function CatList({budgetID}){
 
 const [cats,setCats]=useState([]);    
 const focusRef=useRef(null);
+const [refreshDate,setRefreshDate]=useState("");
 useEffect(()=>{
 async function fetchData(){
 try{
@@ -21,7 +22,7 @@ console.log(e);
 }
 fetchData();
 
-},[budgetID]);
+},[budgetID,refreshDate]);
 
     const checkboxCell=(props: GridCellProps) => {
 const isRecurring=props.dataItem[props.field]; 
@@ -41,6 +42,15 @@ return (<td><button onClick={e=>{
 
 
 }
+const refreshGrid=()=>{
+setRefreshDate(new Date());
+ 
+}
+
+const closeDialog=()=>{
+    setIsEditing(false);
+    
+}
 return(<div>
 <h1>List of Categories</h1>
 <Grid data={cats}>
@@ -50,11 +60,8 @@ return(<div>
 
 <Column title="Edit" cell={editCell}/>
 </Grid>
-{isEditing&&<Dialog title="Edit Category" onClose={()=>{
-setIsEditing(false);
-
-}} >
-    <AddCategory mode="Edit" budgetId={budgetID} category={editCat} focusRef={focusRef}/>
+{isEditing&&<Dialog title="Edit Category" onClose={closeDialog}>
+    <AddCategory mode="Edit" budgetId={budgetID} category={editCat} refresh={refreshGrid} closeDialog={closeDialog} />
     </Dialog>}
 </div>)
 }

@@ -1,8 +1,10 @@
 "use client";
+import { updateCategory } from "@/app/actions/categories";
+import { useFormState } from "react-dom";
 import { Input, NumericTextBox } from "@progress/kendo-react-inputs";
 import { Checkbox } from "@progress/kendo-react-inputs";
 import { useState, useEffect } from "react";
-export default function AddCategory({ budgetId, category, mode, focusRef }) {
+export default function AddCategory({ budgetId, category, mode, refresh,closeDialog}) {
   const [categoryState, setCategory] = useState(category);
   const [modeState, setModeState] = useState(mode);
   const handleChange = (e) => {
@@ -15,14 +17,26 @@ export default function AddCategory({ budgetId, category, mode, focusRef }) {
   useEffect(() => {
     // focusRef.focus();
   });
-
+const initialState={message:''};
+const [refreshCount,setRefreshCount]=useState(0);
+const [formState,formAction]=useFormState(updateCategory,initialState);
   const { name, isRecurring, amount, id } = categoryState;
+  
+  if (formState.message&&refreshCount===0){
+refresh();
+closeDialog();
+setRefreshCount(1);
+
+  }
   if (modeState === "Add"  ||modeState==="Edit") {
     return (
       <div>
         <h1>{modeState} Category</h1>
+<div role="status">
+{formState.message}
 
-        <form method="post" action="/api/categories">
+</div>
+        <form action={formAction}>
           <input type="hidden" name="id" value={id} />
           <Input
             type="text"
