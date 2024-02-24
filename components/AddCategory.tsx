@@ -21,13 +21,14 @@ const initialState={message:''};
 const [refreshCount,setRefreshCount]=useState(0);
 const [formState,formAction]=useFormState(updateCategory,initialState);
   const { name, isRecurring, amount, id } = categoryState;
-  
-  if (formState.message&&refreshCount===0){
+  useEffect(() => {
+  if (formState.message){
 refresh();
 closeDialog();
-setRefreshCount(1);
+
 
   }
+}, [formState.message]);
   if (modeState === "Add"  ||modeState==="Edit") {
     return (
       <div>
