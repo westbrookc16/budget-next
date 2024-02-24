@@ -1,8 +1,11 @@
+"use server";
 import { getSessionUser } from "@/utils/getSessionUser";
 import prisma from "@/utils/prisma";
+import { cookies } from "next/headers";
 
-export const POST = async (request: any) => {
-  const data = await request.formData();
+//action
+export async function updateBudget(initialState: any, data: FormData) {
+  "use server";
 
   const month = parseInt(data.get("realMonth"));
   const year = parseInt(data.get("year"));
@@ -28,8 +31,11 @@ export const POST = async (request: any) => {
       where: { id: budgetId },
     });
   }
-  return Response.redirect(
-    `${process.env.NEXTAUTH_URL}/budget/${month}/${year}`
-  );
+  cookies().set("notification", "Your budget was updated successfully.", {
+    expires: new Date().setSeconds(new Date().getSeconds() + 20),
+    httpOnly: false,
+  });
+
+  return { message: "Your budget was updated successfully." };
   //}
-};
+}
