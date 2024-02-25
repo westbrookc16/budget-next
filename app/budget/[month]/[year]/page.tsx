@@ -35,7 +35,7 @@ try{
 setCats(await catsRes.json());
 }
 catch(e){
-console.log(e);
+
 
 }
 }

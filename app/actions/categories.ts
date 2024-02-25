@@ -20,13 +20,11 @@ export async function updateCategory(initialState: any, data: FormData) {
       (data.get("amount")?.toString() ?? "").replace("$", "").replace(",", "")
     );
     if (!id) {
-      console.log("insert");
       //insert a new category
       const catInserted = await prisma.categories.create({
         data: { budgetId, isRecurring, amount, name },
       });
     } else {
-      console.log(`isRecurring=${data.get("isRecurring")}`);
       await prisma.categories.update({
         where: { id },
         data: { name, amount, isRecurring },
@@ -34,7 +32,7 @@ export async function updateCategory(initialState: any, data: FormData) {
     } //end else
   } catch (e) {
     //end try catch
-    console.log(e);
+
     return { message: e };
   } //end try catch 2
 
