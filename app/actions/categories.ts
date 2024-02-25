@@ -1,7 +1,8 @@
 "use server";
 import prisma from "@/utils/prisma";
 export async function updateCategory(initialState: any, data: FormData) {
-  const id = data.get("id");
+  const id = data.get("id")?.toString() ?? "";
+
   const action = data.get("action");
 
   try {
@@ -12,11 +13,11 @@ export async function updateCategory(initialState: any, data: FormData) {
     }
     //now do insert or update
     const isRecurring = data.get("isRecurring") === "on" ? true : false;
-    const budgetId = data.get("budgetId");
+    const budgetId = data.get("budgetId")?.toString() ?? "";
 
-    const name = data.get("name");
+    const name = data.get("name")?.toString() ?? "";
     const amount = parseFloat(
-      data.get("amount").replace("$", "").replace(",", "")
+      (data.get("amount")?.toString() ?? "").replace("$", "").replace(",", "")
     );
     if (!id) {
       console.log("insert");
