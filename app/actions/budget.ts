@@ -18,12 +18,11 @@ export async function updateBudget(initialState: any, data: FormData) {
   const { userId } = auth();
 
   if (!userId) {
-    console.log(`no user`);
     return new Response(`{ msg: "no user" }`, { status: 500 });
   }
 
   const budgetId = data.get("budgetId") ?? "";
-  console.log(`budgetId=${budgetId}`);
+
   if (!budgetId) {
     //do an insert
     const resBudget = await prisma.budgets.create({
