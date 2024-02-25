@@ -73,7 +73,7 @@ formState.message.toString()}
             label="Is Recurring"
           />
           <input type="hidden" name="budgetId" value={budgetId} />
-          <input type="submit" value="add" />
+          <input type="submit" value={modeState==="Add"?"Add":"Update"} />
         </form>
       </div>
     );

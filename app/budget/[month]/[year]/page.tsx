@@ -88,14 +88,20 @@ router.push(`/budget/${ddlMonth}/${e.target.value}`);
     const [addCat,setAddCat]=useState<boolean>(false);
     const [success,setSuccess]=useState<boolean>(false);
     
+    const [totalLeft,setTotalLeft]=useState<number>(0);
+    const [refreshBudget,setRefreshBudget]=useState<Date>(new Date());
+    useEffect(()=>{
+
+    setTotalLeft(budget.income-totalBudgeted());
     
-    
+    },[budget.income,cats]);
     const status=useFormStatus();
     
 //display notification if formState has changed
 useEffect(() => {
     if ('message' in formState && formState.message) {
         setSuccess(true);
+        setRefreshBudget(new Date());
         setTimeout(() => {
             setSuccess(false);
         }, 5000);
@@ -113,7 +119,7 @@ useEffect(() => {
 }
 fetchData();
 
-    },[month,year]);
+    },[month,year,refreshBudget]);
     if (loading){
 return (<div role="status">loading...</div>);
 
@@ -168,7 +174,7 @@ return (<div role="status">loading...</div>);
     
 <div>Total Income: {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(budget.income)}</div>
     <div aria-live="polite">
-There is {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(budget.income-totalBudgeted())} left to budget.
+There is {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(totalLeft)} left to budget.
 
     </div>
     </div>

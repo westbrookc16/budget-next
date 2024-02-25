@@ -63,7 +63,7 @@ setIsDeleting(false);
 refreshGrid();
 
 }
-},[deleteFormState.message,isDeleting,refreshGrid]);
+},[deleteFormState.message,refreshGrid]);
 return(<div>
 <h1>List of Categories</h1>
 <Grid data={cats}>
