@@ -99,7 +99,7 @@ useEffect(()=>{
         setTimeout(() => {
            setSuccess(false); 
         }, 5000);
-    },[formState.message]);
+    },[formState]);
     
     
     
