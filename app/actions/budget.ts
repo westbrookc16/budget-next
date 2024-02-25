@@ -7,20 +7,22 @@ import { auth } from "@clerk/nextjs";
 export async function updateBudget(initialState: any, data: FormData) {
   "use server";
 
-  const month = parseInt(data.get("realMonth"));
-  const year = parseInt(data.get("year"));
+  const monthValue = data.get("realMonth");
+  const month = monthValue ? parseInt(monthValue.toString()) : 0;
 
+  const yearValue = parseInt(data.get("year")?.toString() ?? "0");
+  const year = yearValue ? parseInt(yearValue.toString()) : 0;
   const income = parseFloat(
-    data.get("income").replace("$", "").replace(",", "")
+    (data.get("income")?.toString() ?? "").replace("$", "").replace(",", "")
   );
   const { userId } = auth();
-  console.log(`userId=${userId}`);
+
   if (!userId) {
     console.log(`no user`);
     return new Response(`{ msg: "no user" }`, { status: 500 });
   }
 
-  const budgetId = data.get("budgetId");
+  const budgetId = data.get("budgetId") ?? "";
   console.log(`budgetId=${budgetId}`);
   if (!budgetId) {
     //do an insert
@@ -30,7 +32,7 @@ export async function updateBudget(initialState: any, data: FormData) {
   } else {
     await prisma.budgets.update({
       data: { income },
-      where: { id: budgetId },
+      where: { id: budgetId.toString() },
     });
   }
   cookies().set("notification", "Your budget was updated successfully.", {

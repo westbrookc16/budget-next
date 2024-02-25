@@ -1,13 +1,15 @@
 "use client";
 import { updateCategory } from "@/app/actions/categories";
+import type{category} from "@/types/category";
 import { useFormState } from "react-dom";
 import { Input, NumericTextBox } from "@progress/kendo-react-inputs";
 import { Checkbox } from "@progress/kendo-react-inputs";
 import { useState, useEffect } from "react";
-export default function AddCategory({ budgetId, category, mode, refresh,closeDialog}) {
+import type{ formState } from "@/types/formstate";
+export default function AddCategory({ budgetId, category, mode, refresh,closeDialog}: { budgetId: string; category: category; mode: string; refresh: () => void;closeDialog:()=>void }){
   const [categoryState, setCategory] = useState(category);
   const [modeState, setModeState] = useState(mode);
-  const handleChange = (e) => {
+  const handleChange = (e:any) => {
     const { name, value } = e.target;
     setCategory((c) => {
       return { ...c, [name]: value };
@@ -17,8 +19,9 @@ export default function AddCategory({ budgetId, category, mode, refresh,closeDia
   useEffect(() => {
     // focusRef.focus();
   });
-const initialState={message:''};
+const initialState:formState={message:'',timestamp:new Date()};
 const [refreshCount,setRefreshCount]=useState(0);
+
 const [formState,formAction]=useFormState(updateCategory,initialState);
   const { name, isRecurring, amount, id } = categoryState;
   useEffect(() => {
@@ -28,13 +31,16 @@ closeDialog();
 
 
   }
-}, [formState.message]);
+}, [formState.message,refresh,closeDialog]);
   if (modeState === "Add"  ||modeState==="Edit") {
     return (
       <div>
         <h1>{modeState} Category</h1>
 <div role="status">
-{formState.message}
+
+{
+// @ts-ignore 
+formState.message.toString()}
 
 </div>
         <form action={formAction}>

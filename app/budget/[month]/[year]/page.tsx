@@ -15,12 +15,14 @@ import { Form, Field, FormElement } from '@progress/kendo-react-form';
 import { Error } from '@progress/kendo-react-labels';
 import { Input,NumericTextBox } from '@progress/kendo-react-inputs';
 import { Dialog } from "@progress/kendo-react-dialogs";
+import { category } from '@/types/category';
+import { month } from '@/types/month';
 
 export default function HandleBudgetPage(){
-const initialState={message:''};
+const initialState={message:'',timestamp:new Date()};
 const [budget,setBudget]=useState({year:'2024',month:'1',income:0,id:''});
-const [refreshDate,setRefreshDate]=useState("");
-const [cats,setCats]=useState([]);    
+const [refreshDate,setRefreshDate]=useState<Date>(new Date());
+const [cats,setCats]=useState<category[]>([]);    
 const totalBudgeted=()=>{let total=0;
     cats.forEach(cat=>total+=cat.amount);
     return total;
@@ -69,9 +71,8 @@ const {month, year}=useParams();
         {name:'Nov',value:11},
         {name:'Dec',value:12}
     ];
-    const [ddlMonth,setDdlMonth]=useState(months.filter((v)=>v.value===parseInt(month))[0]);
-
-    const [ddlYear,setDdlYear]=useState(year);
+    const [ddlMonth,setDdlMonth]=useState<month>(months.filter((v)=>v.value===parseInt(month.toString()))[0] as month);
+    const [ddlYear,setDdlYear]=useState<string>(year.toString());
     
     
     const changeBudget=(e:any)=>{
@@ -85,21 +86,21 @@ router.push(`/budget/${ddlMonth}/${e.target.value}`);
 }
     };
     const [addCat,setAddCat]=useState<boolean>(false);
-    const [success,setSuccess]=useState(false);
+    const [success,setSuccess]=useState<boolean>(false);
     
     
     
     const status=useFormStatus();
     
 //display notification if formState has changed
-useEffect(()=>{
-    if (formState.message)
-        
+useEffect(() => {
+    if ('message' in formState && formState.message) {
         setSuccess(true);
         setTimeout(() => {
-           setSuccess(false); 
+            setSuccess(false);
         }, 5000);
-    },[formState]);
+    }
+}, [formState]);
     
     
     
@@ -145,18 +146,18 @@ return (<div role="status">loading...</div>);
             }}
         >
         <Fade>
-            {success&& <Notification
-            type={{ style: 'success', icon: true }}
-            closable={false}
-            onClose={() =>{ setSuccess(false);
-                setSuccess(false);
-            
-            }}
-                    >
-      
-                {formState.message}
-
-            </Notification>}
+            {success && (
+                <Notification
+                    type={{ style: 'success', icon: true }}
+                    closable={false}
+                    onClose={() => {
+                        setSuccess(false);
+                        setSuccess(false);
+                    }}
+                >
+                    {('message' in formState && formState.message) || ''}
+                </Notification>
+            )}
         </Fade>
     </NotificationGroup>
     </div>

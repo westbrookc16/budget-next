@@ -1,6 +1,6 @@
 import { auth, currentUser } from "@clerk/nextjs";
 import prisma from "@/utils/prisma";
-export async function GET(request, { params }) {
+export async function GET(request: Request, { params }: any) {
   const { month, year } = params;
   //get user from clerk
   const { userId } = auth();
