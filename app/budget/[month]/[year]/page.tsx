@@ -1,4 +1,5 @@
 'use client';
+import {GlobalStateContext} from "@/components/globalState";
 import type{category} from "@/types/category";
 import { Fade } from '@progress/kendo-react-animation';
 
@@ -20,14 +21,12 @@ import { Input, NumericTextBox } from '@progress/kendo-react-inputs';
 import { Dialog } from '@progress/kendo-react-dialogs';
 import { Oval } from 'react-loader-spinner';
 
+import { useContext } from "react";
 export default function HandleBudgetPage() {
+  //use global state context
+  
+  const { budget, setBudget, loading, setLoading, refreshDate, setRefreshDate, cats, setCats, total, setTotal } = useContext(GlobalStateContext);
   const initialState:any = { message: '' };
-  const [budget, setBudget] = useState({
-    year: '2024',
-    month: '1',
-    income: 0,
-    id: '',
-  });
   const [formState, formAction] = useFormState(updateBudget, initialState);
 
 
@@ -35,12 +34,8 @@ export default function HandleBudgetPage() {
   const { month, year } = useParams();
 
   const [realMonth, setRealMonth] = useState(month);
-  const [loading, setLoading] = useState(true);
-  const [refreshDate, setRefreshDate] = useState<Date>(new Date());
-  const [cats, setCats] = useState<category[]>([]);
-  const [total, setTotal] = useState(0);
 
-
+  
 
 
 const months=[
@@ -84,7 +79,7 @@ router.push(`/budget/${ddlMonth}/${e.target.value}`);
     },[budget.income,cats,total]);
     useEffect(()=>{
 
-      setTotal(cats.reduce((acc,cat)=>acc+cat.amount,0));
+      setTotal(cats.reduce((acc:number,cat:category)=>acc+cat.amount,0));
     },[cats]);
     const status=useFormStatus();
     
