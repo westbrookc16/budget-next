@@ -1,19 +1,20 @@
 'use client';
-import { SignInButton, UserButton } from "@clerk/nextjs";
-import { useState,useEffect } from 'react';
+import { SignInButton, UserButton } from '@clerk/nextjs';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import logo from '@/assets/images/logo-white.png';
 import profileDefault from '@/assets/images/profile.png';
 import { FaGoogle } from 'react-icons/fa';
-import { useUser } from "@clerk/nextjs";
+import { useUser } from '@clerk/nextjs';
+import styles from '@/css/styles.module.css';
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
+
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  
+
   const [providers, setProviders] = useState(null);
-    const { isLoaded, isSignedIn, user } = useUser();
+  const { isLoaded, isSignedIn, user } = useUser();
   /*useEffect(() => {
     const setAuthProviders = async () => {
       const res = await getProviders();
@@ -29,70 +30,100 @@ return Object.values(providers).map((provider) => (
   <button
   key={provider.id}  
   onClick={() => signIn(provider?.id)}
-    class='flex items-center space-x-2 focus:outline-none'
+    className='flex items-center space-x-2 focus:outline-none'
   >
-    <FaGoogle class='text-red-500' />
-    <span class='text-white font-semibold'>Sign In with {provider.name}</span>
+    <FaGoogle className='text-red-500' />
+    <span className='text-white font-semibold'>Sign In with {provider.name}</span>
   </button>
 ));
 
 }
 
 }*/
-  
-  return (
-    <nav class='bg-blue-700 border-b border-blue-500'>
-      <div class='container mx-auto flex items-center justify-between'>
-        <Link href='/'>
-          
-            <Image src={logo} alt='logo' width={150} height={50} />
 
-        </Link>
-        <div class='hidden md:flex items-center space-x-3'>
-          <Link href='/' className='text-white font-semibold'>
-            Home
-          </Link>
-          
-          {isLoaded&&isSignedIn? (
-            <>
-            <div class='relative'>
-              <UserButton />
-              <Link href={`/budget/${new Date().getMonth() + 1}/${new Date().getFullYear()}`} className='text-white>font-semibold'>Budget</Link>
-              
-              <button
-                onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                class='flex items-center space-x-2 focus:outline-none'
-              aria-expanded={isProfileMenuOpen}>
+  // console.log(isLoaded, isSignedIn);
+
+  return (
+    <div>
+      <div className={styles.navContainer}>
+        <div className={styles.navWrapper}>
+          <div className={styles.navLeft}>
+            <div className={styles.navLeftLinks}>
+              <Link href='/' className={styles.navLeftLink}>
                 <Image
-                  src={profileDefault}
-                  alt='profile'
-                  width={30}
-                  height={30}
-                  class='rounded-full'
+                  src={logo}
+                  alt='logo'
+                  width={45}
+                  height={45}
+                  className={styles.logo}
                 />
-                <span class='text-white font-semibold'>
-                  {user.fullName}
-                </span>
-              </button>
-              
-              {isProfileMenuOpen && (
-                <div class='absolute top-12 right-0 bg-white p-3 shadow-lg rounded-md'>
-                  <button
-                    onClick={() => signOut()}
-                    class='flex items-center space-x-3 focus:outline-none'
+              </Link>
+            </div>
+          </div>
+          <div className={styles.navMiddle}></div>
+          <div className={styles.navRight}>
+            <div className={styles.navRightLinks}>
+              <Link href='/' className={styles.homeLink}>
+                Home
+              </Link>
+              {isLoaded && isSignedIn ? (
+                <>
+                  <Link
+                    href={`/budget/${
+                      new Date().getMonth() + 1
+                    }/${new Date().getFullYear()}`}
+                    className={styles.link}
                   >
-                    <FaGoogle class='text-red-500' />
-                    <span class='text-red-500 font-semibold'>Sign Out</span>
+                    Budget
+                  </Link>
+                  <div className={styles.link}>
+                    <UserButton />
+                  </div>
+                  <button
+                    onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                    className={styles.btn}
+                    aria-expanded={isProfileMenuOpen}
+                  >
+                    <Image
+                      src={profileDefault}
+                      alt='profile'
+                      width={30}
+                      height={30}
+                      className='rounded-full mr-2'
+                    />
+                    <span
+                      style={{ fontSize: 15 }}
+                      className='hidden text-white mt-1 lg:block'
+                    >
+                      {/* {user.fullName} */}
+                      username
+                    </span>
                   </button>
+
+                  {isProfileMenuOpen && (
+                    <div className={styles.btn}>
+                      <button
+                        // onClick={() => signOut()}
+                        className={styles.btnInside}
+                      >
+                        <FaGoogle className='text-white' />
+                        <span className='text-white font-semibold'>
+                          Sign Out
+                        </span>
+                      </button>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div>
+                  <SignInButton />
                 </div>
               )}
             </div>
-          </>
-              ) : (<div><SignInButton/></div>)
-          }
+          </div>
         </div>
-</div>
-</nav>
+      </div>
+    </div>
   );
 };
 export default Navbar;

@@ -1,0 +1,110 @@
+.navContainer {
+  background: rgb(29 78 216);
+  height: 90px;
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  box-shadow: 0 4px 2px -2px gray;
+}
+
+.navWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  width: 100%;
+}
+.navLeft {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.navLeftLinks > .navLeftLink {
+  text-decoration: none;
+  transition: 300ms ease-in-out;
+}
+.navMiddle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo > img {
+  height: 50px;
+  width: 50px;
+  object-fit: cover;
+  border-radius: 10%;
+  border: 0.5px solid var(--color-primary);
+  padding: 2px;
+  background: var(--color-bg-variant2);
+}
+.navRightLinks {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.navRightLinks > .link {
+  color: rgb(206, 206, 206);
+  text-decoration: none;
+  transition: 300ms ease-in-out;
+  margin-right: 40px;
+}
+.navRightLinks > .homeLink {
+  color: rgb(206, 206, 206);
+  text-decoration: none;
+  transition: 300ms ease-in-out;
+  margin-right: 40px;
+}
+.navRightLinks > .btn {
+  color: rgb(206, 206, 206);
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  margin-right: 40px;
+}
+.navRightLinks > .btn > .btnInside {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  font-size: 14px;
+  align-items: center;
+  transition: 300ms ease-in-out;
+  gap: 5px;
+  background-color: rgb(228, 93, 93);
+  padding: 5px;
+  border-radius: 5px;
+}
+.navRightLinks > .btn > .btnInside:hover {
+  background-color: rgb(223, 71, 71);
+}
+
+.navRightLinks > .link:hover {
+  color: #fff;
+}
+
+/* media queries */
+@media only screen and (max-width: 746px) {
+  .navContainer {
+    height: 80px;
+  }
+  /* .navWrapper {
+    padding: 20px 40px;
+  } */
+  .logo {
+    height: 40px;
+    width: 40px;
+  }
+  .navMiddle {
+    display: none;
+  }
+  .navRightLinks > .homeLink {
+    display: none;
+  }
+  .navRightLinks > .link {
+    margin-right: 25px;
+  }
+}
+@media (max-width: 768px) {
+}
