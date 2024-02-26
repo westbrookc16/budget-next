@@ -82,6 +82,10 @@ router.push(`/budget/${ddlMonth}/${e.target.value}`);
     setTotalLeft(budget.income-Number(total));
     
     },[budget.income,cats,total]);
+    useEffect(()=>{
+
+      setTotal(cats.reduce((acc,cat)=>acc+cat.amount,0));
+    },[cats]);
     const status=useFormStatus();
     
 //display notification if formState has changed
