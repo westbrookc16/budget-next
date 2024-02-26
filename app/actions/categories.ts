@@ -33,7 +33,7 @@ export async function updateCategory(initialState: any, data: FormData) {
   } catch (e) {
     //end try catch
 
-    return { message: e };
+    return { message: "There was an error." };
     console.error(e);
   } //end try catch 2
 
