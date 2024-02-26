@@ -1,8 +1,7 @@
 "use server";
 import prisma from "@/utils/prisma";
 export async function updateCategory(initialState: any, data: FormData) {
-  const id = data.get("id")?.toString() ?? "";
-
+  const id = String(data.get("id"));
   const action = data.get("action");
 
   try {
@@ -12,6 +11,7 @@ export async function updateCategory(initialState: any, data: FormData) {
       return { message: "Your category was deleted successfully." };
     }
     //now do insert or update
+
     const isRecurring = data.get("isRecurring") === "on" ? true : false;
     const budgetId = data.get("budgetId")?.toString() ?? "";
 
@@ -34,6 +34,7 @@ export async function updateCategory(initialState: any, data: FormData) {
     //end try catch
 
     return { message: e };
+    console.error(e);
   } //end try catch 2
 
   return { message: "Your category was updated/added successfully." };
