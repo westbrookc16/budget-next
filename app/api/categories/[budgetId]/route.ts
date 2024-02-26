@@ -1,9 +1,9 @@
-import prisma from "@/utils/prisma";
+import prisma from '@/utils/prisma';
 
-export const GET = async (request, { params }) => {
+export const GET = async (request, { params }: any) => {
   const { budgetId } = params;
   const categories = await prisma.categories.findMany({
-    where: { budgetId: budgetId },
+    where: { budgetId },
   });
   return new Response(JSON.stringify(categories));
 };
