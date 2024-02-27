@@ -1,4 +1,5 @@
 import type { budget } from "@/types/budget";
+import type { transaction } from "@/types/transaction";
 import type { category } from "@/types/category";
 export type globalState = {
   budget: budget;
@@ -11,4 +12,6 @@ export type globalState = {
   setCats: (cats: category[]) => void;
   total: number;
   setTotal: (total: number) => void;
+  transactions: transaction[];
+  setTransactions: (transactions: transaction[]) => void;
 };

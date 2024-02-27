@@ -28,13 +28,14 @@ export default function RootLayout({
   
   return (
   <ClerkProvider>    
-<GlobalStateProvider>
+
     <html lang="en">
       <body className={inter.className}>
         <Navbar/>
-        {children}</body>
+        <GlobalStateProvider>
+        {children}</GlobalStateProvider></body>
     </html>
-    </GlobalStateProvider>
+    
 </ClerkProvider>    
 
   );

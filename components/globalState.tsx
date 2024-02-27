@@ -3,6 +3,7 @@ import React,{ createContext, useState } from "react";
 import type { globalState } from "@/types/globalState";
 import type { budget } from "@/types/budget";
 import type { category } from "@/types/category";
+import type { transaction } from "@/types/transaction";
 export const GlobalStateContext = createContext<globalState>({
     budget: {
         year: 2024,
@@ -19,9 +20,12 @@ export const GlobalStateContext = createContext<globalState>({
     setCats: () => {},
     total: 0,
     setTotal: () => {},
+    transactions: [],
+    setTransactions: () => {},
 });
 export default function GlobalStateProvider({children}: Readonly<{children: React.ReactNode}>) {
   const [total, setTotal] = useState(0);
+  const [transactions, setTransactions] = useState<transaction[]>([]);
     
 
 const [budget, setBudget] = useState<budget>({
@@ -47,6 +51,8 @@ const [cats, setCats] = useState<category[]>([]);
         setCats,
         total,
         setTotal,
+        transactions,
+        setTransactions
       }}
     >
       {children}

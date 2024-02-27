@@ -11,6 +11,7 @@ import {
 import { Checkbox } from '@progress/kendo-react-inputs';
 import { useFormState } from 'react-dom';
 import { updateCategory } from '@/app/actions/categories';
+import Link from 'next/link';
 
 export default function CatList({ budgetID, cats, refreshGrid }: any) {
   const originalState = { message: '' };
@@ -21,7 +22,12 @@ export default function CatList({ budgetID, cats, refreshGrid }: any) {
 
   //state for the add category dialog
   const [addCat, setAddCat] = useState(false);
+const editTransactionsCell=(props:GridCellProps)=>{
+  return (<td>
+<Link href={`/transactions/${props.dataItem.id}`}>Edit Transactions</Link>
 
+  </td>);
+};
   const checkboxCell = (props: GridCellProps) => {
     const isRecurring = props.dataItem[props.field??""];
     return (
@@ -95,6 +101,7 @@ export default function CatList({ budgetID, cats, refreshGrid }: any) {
 
         <Column title='Edit' cell={editCell} />
         <Column title='Delete' cell={deleteCell} />
+      <Column title='Edit Transactions' cell={editTransactionsCell} />
       </Grid>
       {isEditing && (
         <Dialog
