@@ -1,5 +1,5 @@
 'use client';
-import { SignInButton, UserButton } from '@clerk/nextjs';
+import { SignInButton, SignOutButton, UserButton } from '@clerk/nextjs';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -9,9 +9,9 @@ import { FaGoogle } from 'react-icons/fa';
 import { useUser } from '@clerk/nextjs';
 import styles from '@/css/styles.module.css';
 const Navbar = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
 
-  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+
 
   const [providers, setProviders] = useState(null);
   const { isLoaded, isSignedIn, user } = useUser();
@@ -74,46 +74,12 @@ return Object.values(providers).map((provider) => (
                     }/${new Date().getFullYear()}`}
                     className={styles.link}
                   >
-                    Budget
+                    Budget Management
                   </Link>
                   <div className={styles.link}>
-                    <UserButton />
+                    <SignOutButton />
                   </div>
-                  <button
-                    onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                    className={styles.btn}
-                    aria-expanded={isProfileMenuOpen}
-                  >
-                    <Image
-                      src={profileDefault}
-                      alt='profile'
-                      width={30}
-                      height={30}
-                      className='rounded-full mr-2'
-                    />
-                    <span
-                      style={{ fontSize: 15 }}
-                      className='hidden text-white mt-1 lg:block'
-                    >
-                      {/* {user.fullName} */}
-                      username
-                    </span>
-                  </button>
-
-                  {isProfileMenuOpen && (
-                    <div className={styles.btn}>
-                      <button
-                        // onClick={() => signOut()}
-                        className={styles.btnInside}
-                      >
-                        <FaGoogle className='text-white' />
-                        <span className='text-white font-semibold'>
-                          Sign Out
-                        </span>
-                      </button>
-                    </div>
-                  )}
-                </>
+     </>             
               ) : (
                 <div>
                   <SignInButton />
