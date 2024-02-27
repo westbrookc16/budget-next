@@ -227,7 +227,7 @@ fetchData();
         </NotificationGroup>
       </div>
       <div aria-live='off'>
-        <CatList budgetID={budget.id} cats={cats} refreshGrid={refreshGrid} />
+        {budget.id&&(<CatList budgetID={budget.id} cats={cats} refreshGrid={refreshGrid} />)}
       </div>
       <div className='text-md p-5 flex justify-center items-center flex-col gap-3 md:text-xl'>
         <div>
