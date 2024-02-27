@@ -17,7 +17,7 @@ import { ClerkProvider } from '@clerk/nextjs'
 //import { useState,createContext } from "react";
 import type{ budget } from "@/types/budget";
 import type { category } from "@/types/category";
-import GlobalStateProvider, { GlobalStateContext } from "@/components/globalState";
+
 
 export default function RootLayout({
   
@@ -32,8 +32,8 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Navbar/>
-        <GlobalStateProvider>
-        {children}</GlobalStateProvider></body>
+        
+        <main>{children}</main></body>
     </html>
     
 </ClerkProvider>    

@@ -6,5 +6,5 @@ export async function GET(request: Request, { params }: any) {
       categoryId: categoryId,
     },
   });
-  return transactions;
+  return new Response(JSON.stringify(transactions));
 }

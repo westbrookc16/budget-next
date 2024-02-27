@@ -6,7 +6,9 @@ export async function createTransaction(
   data: FormData
 ) {
   const name = String(data.get("name"));
-  const amount = Number(data.get("amount"));
+  const amount = Number(
+    data.get("amount")?.toString().replace("$", "").replace(",", "") || 0
+  );
   const date = new Date(String(data.get("date")));
   const category = String(data.get("realCategory"));
   const description = String(data.get("description"));
@@ -23,4 +25,5 @@ export async function createTransaction(
   } catch (e) {
     console.error(e);
   }
+  return { message: "Transaction created", timestamp: new Date() };
 }

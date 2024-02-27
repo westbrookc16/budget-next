@@ -1,8 +1,8 @@
 'use client';
-import {GlobalStateContext} from "@/components/globalState";
+import {useGlobalState} from "@/components/globalState";
 import type{category} from "@/types/category";
 import { Fade } from '@progress/kendo-react-animation';
-
+import type { globalState } from "@/types/globalState";
 import {
   Notification,
   NotificationGroup,
@@ -24,8 +24,8 @@ import { Oval } from 'react-loader-spinner';
 import { useContext } from "react";
 export default function HandleBudgetPage() {
   //use global state context
-  
-  const { budget, setBudget, loading, setLoading, refreshDate, setRefreshDate, cats, setCats, total, setTotal } = useContext(GlobalStateContext);
+  const state:globalState = useGlobalState();
+  const { budget, setBudget, loading, setLoading, refreshDate, setRefreshDate, cats, setCats, total, setTotal } = state;
   const initialState:any = { message: '' };
   const [formState, formAction] = useFormState(updateBudget, initialState);
 
