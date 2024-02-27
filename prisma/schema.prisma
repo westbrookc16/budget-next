@@ -32,3 +32,14 @@ budgetId String
     amount Float
 isRecurring Boolean
 }
+model Transactions{
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  amount Float
+  date DateTime
+  description String
+  categoryId String
+  
+
+  
+}
