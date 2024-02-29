@@ -17,15 +17,19 @@ id       String    @id @default(auto()) @map("_id") @db.ObjectId
 month Int
 year Int
 income Float
-userId String?
+userId String
 }
 model users{
 
   email String
   id       String    @id @default(auto()) @map("_id") @db.ObjectId
-  userName String
-picture String
-}model Categories{
+  user_id String @unique
+  first_name String?
+  last_name String?
+  email_address String?
+  last_sign_in_at Int?
+}
+model Categories{
 budgetId String
     id       String    @id @default(auto()) @map("_id") @db.ObjectId
     name String
@@ -42,4 +46,22 @@ model Transactions{
   
 
   
+}
+model subscriptions{
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+subscription_id String @unique
+user_id String?
+customer String
+metadata String
+status String
+price_id String
+cancel_at_period_end Boolean
+cancel_at DateTime?
+canceled_at DateTime?
+current_period_start DateTime?
+current_period_end DateTime?
+created DateTime
+ended_at DateTime?
+trial_start DateTime?
+trial_end DateTime?
 }

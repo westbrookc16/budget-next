@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 // Please edit this to allow other routes to be public as needed.
 // See https://clerk.com/docs/references/nextjs/auth-middleware for more information about configuring your Middleware
 export default authMiddleware({
-  publicRoutes: ["/"],
+  publicRoutes: ["/", "/api/webhooks", "/api/clerk/webhooks"],
   afterAuth: async (auth, req: NextRequest) => {
     const { userId, sessionClaims } = auth;
 
@@ -31,7 +31,6 @@ export default authMiddleware({
 
     // If the route is public, anyone can view it.
     if (auth.isPublicRoute) {
-      console.log("here.");
       return NextResponse.next();
     }
   },

@@ -6,6 +6,10 @@ export type globalState = {
   setBudget: (budget: budget) => void;
   loading: boolean;
   setLoading: (loading: boolean) => void;
+  subscriptionStatus: string;
+  setSubscriptionStatus: (status: string) => void;
+  customerId: string;
+  setCustomerId: (customerId: string) => void;
   refreshDate: Date;
   setRefreshDate: (refreshDate: Date) => void;
   cats: category[];
