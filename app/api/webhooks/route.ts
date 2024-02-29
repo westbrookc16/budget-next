@@ -20,7 +20,13 @@ const manageSubscriptionStatusChange = async (
 ) => {
   console.log(`Subscription ID: ${subscriptionID}`);
   const subscription = await stripe.subscriptions.retrieve(subscriptionID);
-  console.log(`subscription retrieved`);
+  console.log(
+    `subscription retrieved ===`,
+    customerID,
+    subscriptionID,
+    userId,
+    isSubscriptionCreated
+  );
   //console.log(`Subscription: ${JSON.stringify(subscription)}`);
   const dbSub = await prisma?.subscriptions.findUnique({
     where: { subscription_id: subscriptionID },
@@ -39,42 +45,46 @@ const manageSubscriptionStatusChange = async (
     if (subscription.status === "canceled") {
       return;
     }
+    console.log("subscription status +++", subscription.status);
     // Create a new subscription record in the database
-    await prisma?.subscriptions.create({
-      data: {
-        subscription_id: subscriptionID,
-        user_id: subscription.metadata.userId as string,
-        customer: customerID,
-        status: subscription.status,
-        metadata: JSON.stringify(subscription.metadata),
-        price_id: subscription.items.data[0].price.id,
-        cancel_at_period_end: subscription.cancel_at_period_end,
-        cancel_at: subscription.cancel_at
-          ? toDateTime(subscription.cancel_at as number).toISOString()
-          : null,
-        current_period_end: subscription.current_period_end
-          ? toDateTime(subscription.current_period_end as number).toISOString()
-          : null,
-        canceled_at: subscription.canceled_at
-          ? toDateTime(subscription.canceled_at as number).toISOString()
-          : null,
-        current_period_start: subscription.current_period_start
-          ? toDateTime(
-              subscription.current_period_start as number
-            ).toISOString()
-          : null,
-        created: toDateTime(subscription.created).toISOString(),
-        ended_at: subscription.ended_at
-          ? toDateTime(subscription.ended_at as number).toISOString()
-          : null,
-        trial_end: subscription.trial_end
-          ? toDateTime(subscription.trial_end as number).toISOString()
-          : null,
-        trial_start: subscription.trial_start
-          ? toDateTime(subscription.trial_start as number).toISOString()
-          : null,
-      },
-    });
+    isSubscriptionCreated &&
+      (await prisma?.subscriptions.create({
+        data: {
+          subscription_id: subscriptionID,
+          user_id: subscription.metadata.userId as string,
+          customer: customerID,
+          status: subscription.status,
+          metadata: JSON.stringify(subscription.metadata),
+          price_id: subscription.items.data[0].price.id,
+          cancel_at_period_end: subscription.cancel_at_period_end,
+          cancel_at: subscription.cancel_at
+            ? toDateTime(subscription.cancel_at as number).toISOString()
+            : null,
+          current_period_end: subscription.current_period_end
+            ? toDateTime(
+                subscription.current_period_end as number
+              ).toISOString()
+            : null,
+          canceled_at: subscription.canceled_at
+            ? toDateTime(subscription.canceled_at as number).toISOString()
+            : null,
+          current_period_start: subscription.current_period_start
+            ? toDateTime(
+                subscription.current_period_start as number
+              ).toISOString()
+            : null,
+          created: toDateTime(subscription.created).toISOString(),
+          ended_at: subscription.ended_at
+            ? toDateTime(subscription.ended_at as number).toISOString()
+            : null,
+          trial_end: subscription.trial_end
+            ? toDateTime(subscription.trial_end as number).toISOString()
+            : null,
+          trial_start: subscription.trial_start
+            ? toDateTime(subscription.trial_start as number).toISOString()
+            : null,
+        },
+      }));
     console.log(`Inserting Subscription`);
   } else {
     //if the status is cancelled, delete the subscription
