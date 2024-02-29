@@ -5,7 +5,11 @@ import type { budget } from "@/types/budget";
 import type { category } from "@/types/category";
 import type { transaction } from "@/types/transaction";
 export const useGlobalState=create<globalState>()(persist((set) => ({
-    budget: {
+subscriptionStatus: "",
+setSubscriptionStatus: (s:string) => {set((state:globalState) => ({...state,subscriptionStatus:s}));},
+customerId: "",
+setCustomerId: (c:string) => {set((state:globalState) => ({...state,customerId:c}));},    
+budget: {
         year: 2024,
         month: 1,
         income: 0,

@@ -1,6 +1,8 @@
 'use client';
+import { useAuth } from '@clerk/nextjs';
+import prisma from '@/utils/prisma';
 import { SignInButton, SignOutButton, UserButton } from '@clerk/nextjs';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import logo from '@/assets/images/logo-white.png';
@@ -8,11 +10,12 @@ import profileDefault from '@/assets/images/profile.png';
 import { FaGoogle } from 'react-icons/fa';
 import { useUser } from '@clerk/nextjs';
 import styles from '@/css/styles.module.css';
+import { useGlobalState } from './globalState';
 const Navbar = () => {
   
 
 
-
+const [portalLink, setPortalLink] = useState<string>("");
   const [providers, setProviders] = useState(null);
   const { isLoaded, isSignedIn, user } = useUser();
   /*useEffect(() => {
@@ -21,7 +24,11 @@ const Navbar = () => {
   
       setProviders(res);
     };
-  
+  useeffect(()=>{
+    async function getPortalLink(){
+      const link=await fetch(`/api/create-portal-link/${customerId}`);
+      setPortalLink(link.url);
+    }
     setAuthProviders();
   }, []);
 const SignInButtons=()=>{
@@ -42,8 +49,38 @@ return Object.values(providers).map((provider) => (
 }*/
 
   // console.log(isLoaded, isSignedIn);
+const {userId}=useAuth();
+  const subscriptionStatus=useGlobalState((state)=>state.subscriptionStatus);
+const setSubscriptionStatus=useGlobalState((state)=>state.setSubscriptionStatus);
+const customerId=useGlobalState((state)=>state.customerId);
+const setCustomerId=useGlobalState((state)=>state.setCustomerId);
+useEffect(()=>{
+async function getSubscriptionStatus(){
 
-  return (
+if (!userId){
+setSubscriptionStatus("");
+return;
+
+}
+  const res = await fetch(`/api/users/getSubscriptionStatus/${userId}`);
+  const data = await res.json();
+  setSubscriptionStatus(data.subscriptionStatus);
+  setCustomerId(data.customerId);
+  console.log(data.subscriptionStatus);
+}
+getSubscriptionStatus()
+},[userId]);  
+useEffect(()=>{
+async function getPortalLink(){
+  if(!customerId){return;}
+  const link=await fetch(`/api/create-portal-link/${customerId}`);
+  const data=await link.json();
+  setPortalLink(data.url);
+
+}
+getPortalLink();
+},[customerId]);
+return   (
     <div>
       <div className={styles.navContainer}>
         <div className={styles.navWrapper}>
@@ -78,6 +115,13 @@ return Object.values(providers).map((provider) => (
                   </Link>
                   <div className={styles.link}>
                     <SignOutButton />
+                  {
+                    subscriptionStatus==="active" && (
+                      <Link href={portalLink} className={styles.link}>
+                        Manage Subscription
+                      </Link>
+                    )
+                  }
                   </div>
      </>             
               ) : (

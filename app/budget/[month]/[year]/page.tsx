@@ -73,7 +73,7 @@ router.push(`/budget/${ddlMonth}/${e.target.value}`);
     const [totalLeft,setTotalLeft]=useState<number>(0);
     const [refreshBudget,setRefreshBudget]=useState<Date>(new Date());
     useEffect(()=>{
-
+if (!budget)return;
     setTotalLeft(budget.income-Number(total));
     
     },[budget.income,cats,total]);
@@ -109,7 +109,8 @@ fetchData();
 
   useEffect(() => {
     async function fetchData() {
-      if (budget.id === '') return;
+      if (budget.id === '') {setCats([]);return;}
+      console.log(`fetching categories for budget ${budget.id}`);
       try {
         const catsRes = await fetch(`/api/categories/${budget.id}`);
         const data = await catsRes.json();
