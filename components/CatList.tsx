@@ -1,4 +1,5 @@
 "use client";
+import { formatCurrency } from "@/utils/money";
 import type { category } from "@/types/category";
 import { Dialog, DialogActionsBar } from "@progress/kendo-react-dialogs";
 import { useEffect, useRef, useState } from "react";
@@ -114,7 +115,9 @@ export default function CatList({ budgetID, cats, refreshGrid }: any) {
           field="totalSpent"
           title="Total Spent"
           format="{0:c2}"
-          cell={(e: GridCellProps) => <td>{e.dataItem["totalSpent"] ?? 0}</td>}
+          cell={(e: GridCellProps) => (
+            <td>{formatCurrency(e.dataItem["totalSpent"] ?? 0)}</td>
+          )}
         />
         <Column title="Edit" cell={editCell} />
         <Column title="Delete" cell={deleteCell} />
