@@ -4,4 +4,5 @@ export type category = {
   budgetId: string;
   amount: number;
   isRecurring: boolean;
+  totalSpent: number | undefined;
 };

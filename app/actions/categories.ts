@@ -1,4 +1,5 @@
 "use server";
+import * as sentry from "@sentry/nextjs";
 import prisma from "@/utils/prisma";
 export async function updateCategory(initialState: any, data: FormData) {
   const id = String(data.get("id"));
@@ -32,7 +33,7 @@ export async function updateCategory(initialState: any, data: FormData) {
     } //end else
   } catch (e) {
     //end try catch
-
+    sentry.captureException(e);
     return { message: "There was an error." };
     console.error(e);
   } //end try catch 2

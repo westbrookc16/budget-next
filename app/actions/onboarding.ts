@@ -1,4 +1,5 @@
 "use server";
+import * as sentry from "@sentry/nextjs";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 
 export const completeOnboarding = async (formData: FormData) => {
@@ -17,5 +18,6 @@ export const completeOnboarding = async (formData: FormData) => {
     return { message: res.publicMetadata };
   } catch (err) {
     return { error: "There was an error updating the user metadata." };
+    sentry.captureException(err);
   }
 };
