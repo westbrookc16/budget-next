@@ -13,6 +13,15 @@ export async function POST(req: NextRequest) {
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
+      subscription_data: {
+        trial_settings: {
+          end_behavior: {
+            missing_payment_method: "cancel",
+          },
+        },
+        trial_period_days: 7,
+      },
+      payment_method_collection: "if_required",
       line_items: [
         {
           price: process.env.STRIPE_PRICE_ID as string,

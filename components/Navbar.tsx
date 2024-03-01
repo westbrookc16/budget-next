@@ -69,7 +69,7 @@ return;
   console.log(data.subscriptionStatus);
 }
 getSubscriptionStatus()
-},[userId]);  
+},[userId, setSubscriptionStatus, setCustomerId]);  
 useEffect(()=>{
 async function getPortalLink(){
   if(!customerId){return;}
@@ -116,7 +116,7 @@ return   (
                   <div className={styles.link}>
                     <SignOutButton />
                   {
-                    subscriptionStatus==="active" && (
+                    (subscriptionStatus==="active" ||subscriptionStatus==='trialing')&& (
                       <Link href={portalLink} className={styles.link}>
                         Manage Subscription
                       </Link>

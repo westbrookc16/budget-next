@@ -4,4 +4,5 @@ export type transaction = {
   category: string;
   date: Date;
   description: string;
+  name: string;
 };

@@ -29,7 +29,7 @@ const initialState = { message: '' };
       refresh();
       closeDialog();
     }
-  }, [formState.message]);
+  }, [closeDialog,refresh,formState.message]);
   if (modeState === 'Add' || modeState === 'Edit') {
     return (
       <div>

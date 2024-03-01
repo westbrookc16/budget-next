@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Stripe from "stripe";
 import { stripe } from "@/utils/stripe/config";
-import { link } from "fs";
+
 export async function GET(req: Request, { params }: any) {
   const { customerId } = params;
   const link = await stripe.billingPortal.sessions.create({

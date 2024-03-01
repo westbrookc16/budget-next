@@ -1,3 +1,4 @@
+import * as sentry from "@sentry/nextjs";
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { WebhookEvent } from "@clerk/nextjs/server";
@@ -42,6 +43,7 @@ export async function POST(req: Request) {
     }) as WebhookEvent;
   } catch (err) {
     console.error("Error verifying webhook:", err);
+    sentry.captureException(err);
     return new Response("Error occured", {
       status: 400,
     });

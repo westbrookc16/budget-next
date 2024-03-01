@@ -1,4 +1,5 @@
 "use server";
+import * as Sentry from "@sentry/nextjs";
 //import { getSessionUser } from "@/utils/getSessionUser";
 import prisma from "@/utils/prisma";
 import { cookies } from "next/headers";
@@ -40,6 +41,7 @@ export async function updateBudget(initialState: any, data: FormData) {
     });
   } catch (e) {
     console.error(e);
+    Sentry.captureException(e);
     return {
       message: "There was an error updating your budget.",
       timestamp: new Date(),
