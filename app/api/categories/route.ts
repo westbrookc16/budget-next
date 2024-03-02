@@ -32,6 +32,6 @@ export const POST = async (request: any) => {
   //lets get the budget for the ID and redirect back
   const budget = await prisma.budgets.findFirst({ where: { id: budgetId } });
   return Response.redirect(
-    `${process.env.VERCEL_URL}/budget/${budget?.month}/${budget?.year}`
+    `${process.env.NEXT_PUBLIC_BASE_URL}/budget/${budget?.month}/${budget?.year}`
   );
 };
