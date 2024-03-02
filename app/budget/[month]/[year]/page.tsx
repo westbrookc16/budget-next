@@ -195,7 +195,10 @@ export default function HandleBudgetPage() {
             id="income"
             format="c2"
             name="income"
-            defaultValue={budget.income}
+            value={budget.income}
+            onChange={(e) => {
+              setBudget({ ...budget, income: e.value ?? 0 });
+            }}
             label="Income"
           />
           <input type="hidden" name="budgetId" value={budget.id} />
