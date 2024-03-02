@@ -1,14 +1,17 @@
-'use client';
-import React from 'react';
-import CheckoutButton from '@/components/stripe-payment';
-import { useGlobalState } from '@/components/globalState';
+"use client";
+import React from "react";
+import CheckoutButton from "@/components/stripe-payment";
+import { useGlobalState } from "@/components/globalState";
 const HomePage = () => {
-  const subscriptionStatus=useGlobalState((state)=>state.subscriptionStatus);
-  return (<div>HomePage
-
-<CheckoutButton />
-
-  </div>);
+  const subscriptionStatus = useGlobalState(
+    (state) => state.subscriptionStatus
+  );
+  return (
+    <div>
+      HomePage
+      {subscriptionStatus === "none" && <CheckoutButton />}
+    </div>
+  );
 };
 
 export default HomePage;
