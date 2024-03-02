@@ -9,7 +9,7 @@ const HomePage = () => {
   return (
     <div>
       HomePage
-      {subscriptionStatus === "None" && <CheckoutButton />}
+      {subscriptionStatus === "none" && <CheckoutButton />}
     </div>
   );
 };
