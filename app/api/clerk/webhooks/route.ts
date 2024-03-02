@@ -3,11 +3,7 @@ import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { WebhookEvent } from "@clerk/nextjs/server";
 import prisma from "@/utils/prisma";
-const toDateTime = (secs: number) => {
-  var t = new Date(+0); // Unix epoch start.
-  t.setSeconds(secs);
-  return t;
-};
+
 export async function POST(req: Request) {
   // You can find this in the Clerk Dashboard -> Webhooks -> choose the webhook
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
@@ -24,6 +20,7 @@ export async function POST(req: Request) {
   const svix_signature = headerPayload.get("svix-signature");
   // If there are no headers, error out
   if (!svix_id || !svix_timestamp || !svix_signature) {
+    throw new Error("No svix headers found");
     return new Response("Error occured -- no svix headers", { status: 400 });
   }
 
