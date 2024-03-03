@@ -37,9 +37,9 @@ const Navbar = () => {
       );
       console.dir(res);
       const data = await res.json();
-      setSubscriptionStatus(data.subscriptionStatus);
-      setCustomerId(data.customerId);
-      console.log(data.subscriptionStatus);
+      setSubscriptionStatus(data?.subscriptionStatus);
+      setCustomerId(data?.customerId);
+      //console.log(data.subscriptionStatus);
     }
     getSubscriptionStatus();
   }, [userId, setSubscriptionStatus, setCustomerId]);
