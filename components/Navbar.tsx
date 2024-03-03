@@ -33,7 +33,7 @@ const Navbar = () => {
         return;
       }
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/getSubscriptionStatus/${userId}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}api/users/getSubscriptionStatus/${userId}`
       );
       const data = await res.json();
       setSubscriptionStatus(data.subscriptionStatus);
