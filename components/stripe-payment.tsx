@@ -15,7 +15,7 @@ export default function CheckoutButton() {
       }
 
       const { session } = await (
-        await fetch("/api/stripe-payment", {
+        await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}api/stripe-payment`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

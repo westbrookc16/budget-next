@@ -101,7 +101,9 @@ export default function HandleBudgetPage() {
 
   useEffect(() => {
     async function fetchData() {
-      const res = await fetch(`/api/budget/${month}/${year}`);
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}api/budget/${month}/${year}`
+      );
       const budget = await res.json();
       setBudget(budget);
       setLoading(false);
@@ -117,7 +119,9 @@ export default function HandleBudgetPage() {
       }
       console.log(`fetching categories for budget ${budget.id}`);
       try {
-        const catsRes = await fetch(`/api/categories/${budget.id}`);
+        const catsRes = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}api/categories/${budget.id}`
+        );
         const data = await catsRes.json();
         console.log("data", data);
         setCats(data);

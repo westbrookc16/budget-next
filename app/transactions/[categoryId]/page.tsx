@@ -55,7 +55,11 @@ export default function DisplayTransactions() {
       try {
         if (!selectedCat()) return;
 
-        const res = await fetch(`/api/transactions/${selectedCat().id}`);
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}api/transactions/${
+            selectedCat().id
+          }`
+        );
         const data = await res.json();
         setTransactions(data);
         //get a list of categories

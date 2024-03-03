@@ -48,7 +48,9 @@ const Navbar = () => {
       if (!customerId) {
         return;
       }
-      const link = await fetch(`/api/create-portal-link/${customerId}`);
+      const link = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}api/create-portal-link/${customerId}`
+      );
       console.log(`customerId: ${customerId}`);
       const data = await link.json();
       setPortalLink(data.url);
