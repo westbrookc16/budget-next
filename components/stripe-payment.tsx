@@ -1,4 +1,5 @@
-'use client';
+"use client";
+import * as sentry from "@sentry/nextjs";
 import { loadStripe } from "@stripe/stripe-js";
 
 const stripePromise = loadStripe(
@@ -31,6 +32,7 @@ export default function CheckoutButton() {
       });
     } catch (error) {
       console.error(error);
+      sentry.captureException(error);
     }
   };
 
