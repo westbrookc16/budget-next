@@ -11,9 +11,11 @@ const HomePage = () => {
   return (
     <div>
       HomePage
-      {isLoaded && isSignedIn && subscriptionStatus === "none" && (
-        <CheckoutButton />
-      )}
+      {isLoaded &&
+        isSignedIn &&
+        (subscriptionStatus === "none" || subscriptionStatus === "") && (
+          <CheckoutButton />
+        )}
     </div>
   );
 };
