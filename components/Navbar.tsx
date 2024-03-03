@@ -45,7 +45,7 @@ const Navbar = () => {
   }, [userId, setSubscriptionStatus, setCustomerId]);
   useEffect(() => {
     async function getPortalLink() {
-      if (customerId === "") {
+      if (!customerId) {
         return;
       }
       const link = await fetch(`/api/create-portal-link/${customerId}`);
