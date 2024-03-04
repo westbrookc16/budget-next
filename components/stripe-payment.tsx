@@ -1,10 +1,14 @@
-"use client";
-import * as sentry from "@sentry/nextjs";
-import { loadStripe } from "@stripe/stripe-js";
+'use client';
+import * as sentry from '@sentry/nextjs';
+import { loadStripe } from '@stripe/stripe-js';
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string
 );
+const selectedEnv =
+  process.env.NODE_ENV === 'development'
+    ? process.env.NEXT_PUBLIC_BASE_URL_DEV
+    : process.env.NEXT_PUBLIC_BASE_URL;
 
 export default function CheckoutButton() {
   const handleCheckout = async () => {
@@ -13,12 +17,14 @@ export default function CheckoutButton() {
       if (!stripe) {
         return;
       }
+      console.log('stripe loaded', stripe);
 
       const { session } = await (
-        await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}api/stripe-payment`, {
-          method: "POST",
+        await fetch(`${selectedEnv}api/stripe-payment`, {
+          method: 'POST',
+          mode: 'cors',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             quantity: 1,
@@ -37,12 +43,12 @@ export default function CheckoutButton() {
   };
 
   return (
-    <section className="flex flex-col items-center ">
+    <section className='flex flex-col items-center '>
       <button
         onClick={handleCheckout}
-        className="flex bg-indigo-600 hover:bg-indigo-800 text-white font-semibold py-2 px-4 rounded"
+        className='flex bg-indigo-600 hover:bg-indigo-800 text-white font-semibold py-2 px-4 rounded'
       >
-        <span className="ml-2">Subscribe to Budget Management</span>
+        <span className='ml-2'>Subscribe to Budget Management</span>
       </button>
     </section>
   );
