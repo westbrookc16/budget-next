@@ -22,7 +22,7 @@ export default function CheckoutButton() {
           },
           body: JSON.stringify({
             quantity: 1,
-            product: process.env.NEXT_PUBLIC_STRIPE_PRODUCT_ID,
+            product: process.env.STRIPE_PRODUCT_ID,
           }),
         })
       ).json();
