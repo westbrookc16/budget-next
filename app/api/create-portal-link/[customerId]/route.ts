@@ -12,7 +12,7 @@ export async function GET(req: Request, { params }: any) {
     });
 
     return new Response(JSON.stringify({ url: link.url }), { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
     console.error(error.message);
     sentry.captureException(error);
     //return redirect("/error");
