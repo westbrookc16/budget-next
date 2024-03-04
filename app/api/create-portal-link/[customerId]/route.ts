@@ -15,6 +15,7 @@ export async function GET(req: Request, { params }: any) {
   } catch (error: any) {
     console.error(error.message);
     sentry.captureException(error);
+    return new Response("Error", { status: 500 });
     //return redirect("/error");
   }
 }
