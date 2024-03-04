@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
       payment_method_collection: "if_required",
       line_items: [
         {
-          price: process.env.STRIPE_PRICE_ID as string,
+          price: process.env.STRIPE_PRODUCT_ID as string,
           quantity: 1,
         },
 
