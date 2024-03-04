@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-
+import * as sentry from "@sentry/nextjs";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: "2023-10-16",
 });
@@ -41,6 +41,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ session }, { status: 200 });
   } catch (error) {
+    sentry.captureException(error);
     if (error instanceof Error)
       throw new Error(
         `Error creating Stripe checkout session: ${error.message}`,
