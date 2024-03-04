@@ -205,11 +205,11 @@ export async function POST(req: Request) {
         default:
           throw new Error("Unhandled relevant event!");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
       sentry.captureException(error);
       return new Response(
-        "Webhook handler failed. View your Next.js function logs.",
+        `Webhook handler failed. View your Next.js function logs.${error.message}`,
         {
           status: 400,
         }
