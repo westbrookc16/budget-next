@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 // See https://clerk.com/docs/references/nextjs/auth-middleware for more information about configuring your Middleware
 export default authMiddleware({
   publicRoutes: ["/", "/api/webhooks", "/api/clerk/webhooks"],
-  /*afterAuth: async (auth, req: NextRequest) => {
+  afterAuth: async (auth, req: NextRequest) => {
     const { userId, sessionClaims } = auth;
 
     // For user visiting /onboarding, don't try and redirect
@@ -33,7 +33,7 @@ export default authMiddleware({
     if (auth.isPublicRoute) {
       return NextResponse.next();
     }
-  },*/
+  },
 });
 
 export const config = {
