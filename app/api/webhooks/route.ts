@@ -1,3 +1,4 @@
+import prisma from "@/utils/prisma";
 import * as sentry from "@sentry/nextjs";
 import Stripe from "stripe";
 import { stripe } from "@/utils/stripe/config";
