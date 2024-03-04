@@ -38,7 +38,7 @@
     "@progress/kendo-react-treeview": "^7.2.2",
     "@progress/kendo-svg-icons": "^2.1.0",
     "@progress/kendo-theme-default": "^7.2.0",
-    "@sentry/nextjs": "^7.102.1",
+    "@sentry/nextjs": "^7.104.0",
     "@stripe/react-stripe-js": "^2.5.1",
     "@stripe/stripe-js": "^3.0.6",
     "js-cookie": "^3.0.5",
