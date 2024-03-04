@@ -8,6 +8,7 @@ export async function GET(req: Request, { params }: any) {
     });
     const subscriptionStatus = user?.status ?? "none";
     const customerId = user?.customer ?? "";
+    sentry.captureException(new Error("This is a test error"));
     return new Response(JSON.stringify({ subscriptionStatus, customerId }));
   } catch (error) {
     sentry.captureException(error);
