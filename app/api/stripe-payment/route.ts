@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
             missing_payment_method: "cancel",
           },
         },
-        trial_period_days: 7,
+        trial_period_days: 30,
       },
       payment_method_collection: "if_required",
       line_items: [
