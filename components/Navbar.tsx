@@ -1,4 +1,5 @@
 "use client";
+import * as sentry from "@sentry/nextjs";
 import { useAuth } from "@clerk/nextjs";
 import prisma from "@/utils/prisma";
 import { SignInButton, SignOutButton, UserButton } from "@clerk/nextjs";
@@ -35,13 +36,18 @@ const Navbar = () => {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}api/users/getSubscriptionStatus/${userId}`
       );
-      console.dir(res);
+      //console.dir(res);
       const data = await res.json();
       setSubscriptionStatus(data?.subscriptionStatus);
       setCustomerId(data?.customerId);
       //console.log(data.subscriptionStatus);
     }
-    getSubscriptionStatus();
+    try {
+      getSubscriptionStatus();
+    } catch (err) {
+      console.error(err);
+      sentry.captureException(err);
+    }
   }, [userId, setSubscriptionStatus, setCustomerId]);
   useEffect(() => {
     async function getPortalLink() {
