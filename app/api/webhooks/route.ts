@@ -154,12 +154,14 @@ export async function POST(req: Request) {
   let event: Stripe.Event;
 
   try {
-    if (!sig || !webhookSecret)
+    if (!sig || !webhookSecret) {
+      console.error(`❌ Webhook secret not found.`);
       return new Response("Webhook secret not found.", { status: 400 });
+    }
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
     console.log(`🔔  Webhook received: ${event.type}`);
   } catch (err: any) {
-    console.error(`❌ Error message: ${err.message}`);
+    console.error(`❌ Error message: ${err.message} body=${body} sig=${sig}`);
     sentry.captureException(err);
     return new Response(`Webhook Error: `, { status: 400 });
   }

@@ -8,6 +8,7 @@ export type globalState = {
   setLoading: (loading: boolean) => void;
   subscriptionStatus: string;
   setSubscriptionStatus: (status: string) => void;
+  isActive: () => boolean;
   customerId: string;
   setCustomerId: (customerId: string) => void;
   refreshDate: Date;

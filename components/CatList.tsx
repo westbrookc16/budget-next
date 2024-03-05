@@ -1,4 +1,5 @@
 "use client";
+import { useGlobalState } from "./globalState";
 import { formatCurrency } from "@/utils/money";
 import type { category } from "@/types/category";
 import { Dialog, DialogActionsBar } from "@progress/kendo-react-dialogs";
@@ -97,7 +98,7 @@ export default function CatList({ budgetID, cats, refreshGrid }: any) {
     setIsDeleting(false);
   };
 
-  //if an item has been deleted, close the dialog
+  const isActive = useGlobalState((state) => state.isActive);
 
   return (
     <div className="flex justify-center items-center flex-col p-5">
@@ -111,17 +112,21 @@ export default function CatList({ budgetID, cats, refreshGrid }: any) {
           className="text-lg"
         />
         <Column field="isRecurring" title="Is Recurring" cell={checkboxCell} />
-        <Column
-          field="totalSpent"
-          title="Total Spent"
-          format="{0:c2}"
-          cell={(e: GridCellProps) => (
-            <td>{formatCurrency(e.dataItem["totalSpent"] ?? 0)}</td>
-          )}
-        />
+        {isActive() && (
+          <Column
+            field="totalSpent"
+            title="Total Spent"
+            format="{0:c2}"
+            cell={(e: GridCellProps) => (
+              <td>{formatCurrency(e.dataItem["totalSpent"] ?? 0)}</td>
+            )}
+          />
+        )}
         <Column title="Edit" cell={editCell} />
         <Column title="Delete" cell={deleteCell} />
-        <Column title="Edit Transactions" cell={editTransactionsCell} />
+        {isActive() && (
+          <Column title="Edit Transactions" cell={editTransactionsCell} />
+        )}
       </Grid>
       {isEditing && (
         <Dialog
