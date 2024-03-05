@@ -158,8 +158,8 @@ export async function POST(req: Request) {
       return new Response("Webhook secret not found.", { status: 400 });
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
     console.log(`🔔  Webhook received: ${event.type}`);
-  } catch (err) {
-    //console.log(`❌ Error message: ${err.message}`);
+  } catch (err: any) {
+    console.error(`❌ Error message: ${err.message}`);
     sentry.captureException(err);
     return new Response(`Webhook Error: `, { status: 400 });
   }
@@ -218,6 +218,7 @@ export async function POST(req: Request) {
     }
   } else {
     console.log(`🔔  Unhandled event type: ${event.type}`);
+    console.error(`Unsupported event type: ${event.type}`);
     return new Response(`Unsupported event type: ${event.type}`, {
       status: 400,
     });
