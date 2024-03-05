@@ -3,10 +3,18 @@ import { useRouter } from "next/navigation";
 import { useFormStatus } from "react-dom";
 import { completeOnboarding } from "../actions/onboarding";
 import { useUser } from "@clerk/nextjs";
-export default function Onboarding() {
+function Submit() {
   const { pending } = useFormStatus();
+  return (
+    <button type="submit" disabled={pending === true}>
+      Complete Onboarding
+    </button>
+  );
+}
+export default function Onboarding() {
   const { user } = useUser();
   const router = useRouter();
+
   return (
     <div>
       <h1>Onboarding</h1>
@@ -20,9 +28,7 @@ export default function Onboarding() {
         }}
       >
         Hi, <b>{user?.firstName}</b>, thanks for stopping by.
-        <button type="submit" disabled={pending === true}>
-          Complete Onboarding
-        </button>
+        <Submit />
       </form>
     </div>
   );
