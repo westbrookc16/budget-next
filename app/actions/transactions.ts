@@ -53,7 +53,7 @@ export async function updateTransaction(
   try {
     //get the category for the transaction to get the old total spent
     const cat = await prisma.categories.findUnique({ where: { id: category } });
-    console.log(`id=${id}`);
+
     const currentTransaction = await prisma.transactions.findUnique({
       where: { id },
     });
@@ -68,21 +68,18 @@ export async function updateTransaction(
         description,
       },
     });
-    console.log(`updating total spent for category: ${category}`);
+
     //update the category total spent
-    console.log(
-      `${cat?.totalSpent ?? 0} + ${amount} - ${currentTransaction?.amount ?? 0}`
-    );
+
     const newTotalSpent =
       (cat?.totalSpent ?? 0) + amount - (currentTransaction?.amount ?? 0);
-    console.log(`new total spent: ${newTotalSpent}`);
+
     const updatedCat = await prisma.categories.update({
       where: { id: category },
       data: {
         totalSpent: newTotalSpent,
       },
     });
-    console.log(updatedCat);
   } catch (e) {
     console.error(e);
     sentry.captureException(e);
@@ -100,7 +97,7 @@ export async function deleteTransaction(
       (data.get("amount") as string).replace("$", "").replace(",", "")
     );
     const category = String(data.get("realCategory"));
-    console.log(`category: ${category}`);
+
     const cat = await prisma.categories.findUnique({ where: { id: category } });
     await prisma.categories.update({
       where: { id: category },

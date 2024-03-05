@@ -20,9 +20,8 @@ export default function Onboarding() {
       <h1>Onboarding</h1>
       <form
         action={async (data: FormData) => {
-          console.log("in action");
           const res = await completeOnboarding(data);
-          console.log(res);
+
           await user?.reload();
           router.push(`${process.env.NEXT_PUBLIC_BASE_URL}`);
         }}

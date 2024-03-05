@@ -12,13 +12,11 @@ export const POST = async (request: any) => {
 
   try {
     if (!id) {
-      console.log("insert");
       //insert a new category
       const catInserted = await prisma.categories.create({
         data: { budgetId, isRecurring, amount, name },
       });
     } else {
-      console.log("update");
       await prisma.categories.update({
         where: { id },
         data: { name, amount, isRecurring },
@@ -26,7 +24,7 @@ export const POST = async (request: any) => {
     } //end else
   } catch (e) {
     //end try catch
-    console.log(e);
+
     return new Response("error", { status: 500 });
   } //end try catch 2
   //lets get the budget for the ID and redirect back

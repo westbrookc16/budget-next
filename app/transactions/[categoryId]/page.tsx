@@ -32,7 +32,7 @@ export default function DisplayTransactions() {
     (state: globalState) => state.setTransactions
   );
   const { categoryId } = useParams();
-  //console.log(`categoryId: ${categoryId}`);
+  //
   const selectedCat = useCallback(
     () =>
       categoryId !== "" ? cats.filter((v) => v.id === categoryId)[0] : cats[0],
@@ -40,7 +40,6 @@ export default function DisplayTransactions() {
   );
   const [refreshDate, setRefreshDate] = useState<Date>(new Date());
 
-  console.log(`cats: ${JSON.stringify(cats)}`);
   const [showAddTransaction, setShowAddTransaction] = useState<Boolean>(false);
   const [showEditTransaction, setShowEditTransaction] =
     useState<Boolean>(false);

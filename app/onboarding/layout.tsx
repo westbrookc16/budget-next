@@ -12,14 +12,10 @@ export default function RootLayout({
   // If yes, redirect them to /dashboard
   try {
     const sessionClaims = auth().sessionClaims;
-    console.log(
-      `onboardingComplete: ${sessionClaims?.metadata?.onboardingComplete}`
-    );
+
     if (sessionClaims && sessionClaims.metadata.onboardingComplete === true) {
-      console.log("onboarding complete, redirecting to dashboard");
       redirect(`${process.env.NEXT_PUBLIC_BASE_URL}`);
     } else {
-      console.log("onboarding not complete yet");
     }
   } catch (e: any) {
     console.error(e);

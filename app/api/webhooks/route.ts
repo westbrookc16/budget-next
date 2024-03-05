@@ -20,22 +20,15 @@ const manageSubscriptionStatusChange = async (
   userId: string,
   isSubscriptionCreated: boolean
 ) => {
-  console.log(`Subscription ID: ${subscriptionID}`);
   const subscription = await stripe.subscriptions.retrieve(subscriptionID);
-  console.log(
-    `subscription retrieved ===`,
-    customerID,
-    subscriptionID,
-    userId,
-    isSubscriptionCreated
-  );
-  //console.log(`Subscription: ${JSON.stringify(subscription)}`);
+
+  //
   const dbSub = await prisma?.subscriptions.findUnique({
     where: { subscription_id: subscriptionID },
   });
   if (isSubscriptionCreated) {
     //update metadata for subscription in stripe
-    console.log(`Updating subscription metadata`);
+
     await stripe.subscriptions.update(subscriptionID, {
       metadata: {
         userId: userId,
@@ -47,7 +40,7 @@ const manageSubscriptionStatusChange = async (
     if (subscription.status === "canceled") {
       return;
     }
-    console.log("subscription status +++", subscription.status);
+
     // Create a new subscription record in the database
     isSubscriptionCreated &&
       (await prisma?.subscriptions.create({
@@ -87,18 +80,16 @@ const manageSubscriptionStatusChange = async (
             : null,
         },
       }));
-    console.log(`Inserting Subscription`);
   } else {
     //if the status is cancelled, delete the subscription
     if (subscription.status === "canceled") {
-      console.log(`Deleting subscription`);
       await prisma?.subscriptions.delete({
         where: { subscription_id: subscriptionID },
       });
       return;
     }
     // Update the existing subscription record in the database
-    console.log(`Updating subscription`);
+
     await prisma?.subscriptions.update({
       where: { subscription_id: subscriptionID },
       data: {
@@ -159,7 +150,6 @@ export async function POST(req: Request) {
       return new Response("Webhook secret not found.", { status: 400 });
     }
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
-    console.log(`🔔  Webhook received: ${event.type}`);
   } catch (err: any) {
     console.error(`❌ Error message: ${err.message} body=${body} sig=${sig}`);
     sentry.captureException(err);
@@ -196,7 +186,7 @@ export async function POST(req: Request) {
           if (checkoutSession.mode === "subscription") {
             const subscriptionId = checkoutSession.subscription;
             userId = checkoutSession.metadata?.userId as string;
-            console.log(`userId=${userId}`);
+
             await manageSubscriptionStatusChange(
               subscriptionId as string,
               checkoutSession.customer as string,
@@ -209,7 +199,6 @@ export async function POST(req: Request) {
           throw new Error("Unhandled relevant event!");
       }
     } catch (error: any) {
-      console.log(error);
       sentry.captureException(error);
       return new Response(
         `Webhook handler failed. View your Next.js function logs.${error.message}`,
@@ -219,7 +208,6 @@ export async function POST(req: Request) {
       );
     }
   } else {
-    console.log(`🔔  Unhandled event type: ${event.type}`);
     console.error(`Unsupported event type: ${event.type}`);
     return new Response(`Unsupported event type: ${event.type}`, {
       status: 400,

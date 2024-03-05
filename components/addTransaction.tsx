@@ -49,11 +49,9 @@ export default function AddTransaction({
       <h1>Add Transaction</h1>
       <form
         action={async (data: FormData) => {
-          console.log(`in action`);
           if (mode === "Add") {
             await createTransaction(initialState, data);
           } else {
-            console.log(`in update`);
             await updateTransaction(initialState, data);
           }
           refreshGrid();

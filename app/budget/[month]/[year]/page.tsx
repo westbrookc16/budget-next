@@ -117,13 +117,13 @@ export default function HandleBudgetPage() {
         setCats([]);
         return;
       }
-      console.log(`fetching categories for budget ${budget.id}`);
+
       try {
         const catsRes = await fetch(
           `${process.env.NEXT_PUBLIC_BASE_URL}api/categories/${budget.id}`
         );
         const data = await catsRes.json();
-        console.log("data", data);
+
         setCats(data);
       } catch (e) {
         console.error(e);
@@ -135,7 +135,6 @@ export default function HandleBudgetPage() {
   const refreshGrid = () => {
     const newDate = new Date();
     setRefreshDate(newDate);
-    console.log(newDate);
   };
 
   if (loading) {

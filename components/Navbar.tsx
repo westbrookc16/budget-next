@@ -17,7 +17,7 @@ const Navbar = () => {
   const [providers, setProviders] = useState(null);
   const { isLoaded, isSignedIn, user } = useUser();
 
-  // console.log(isLoaded, isSignedIn);
+  //
   const { userId } = useAuth();
   const subscriptionStatus = useGlobalState(
     (state) => state.subscriptionStatus
@@ -40,7 +40,7 @@ const Navbar = () => {
       const data = await res.json();
       setSubscriptionStatus(data?.subscriptionStatus);
       setCustomerId(data?.customerId);
-      //console.log(data.subscriptionStatus);
+      //
     }
     try {
       getSubscriptionStatus();
@@ -57,7 +57,7 @@ const Navbar = () => {
       const link = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}api/create-portal-link/${customerId}`
       );
-      console.log(`customerId: ${customerId}`);
+
       const data = await link.json();
       setPortalLink(data.url);
     }

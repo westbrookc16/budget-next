@@ -50,11 +50,9 @@ export async function POST(req: Request) {
   const { id } = evt.data;
   const eventType = evt.type;
 
-  console.log(`Webhook with and ID of ${id} and type of ${eventType}`);
-  //console.log("Webhook body:", body);
-  console.log(`userId: ${evt.data.id} and event type: ${evt.type}`);
+  //
+
   if (evt.type === "user.created") {
-    console.log("User created");
     await prisma.users.create({
       data: {
         user_id: evt.data.id,
@@ -64,7 +62,6 @@ export async function POST(req: Request) {
       },
     });
   } else if (evt.type === "user.updated") {
-    console.log("User updated");
     await prisma.users.update({
       where: {
         user_id: evt.data.id,
