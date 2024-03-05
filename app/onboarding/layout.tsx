@@ -22,7 +22,7 @@ export default function RootLayout({
       console.log("onboarding not complete yet");
     }
   } catch (e: any) {
-    console.error(e.message);
+    console.error(e);
   }
   return <>{children}</>;
 }
