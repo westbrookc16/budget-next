@@ -19,5 +19,6 @@ export const completeOnboarding = async (formData: FormData) => {
   } catch (err) {
     return { error: "There was an error updating the user metadata." };
     sentry.captureException(err);
+    console.error(err);
   }
 };
