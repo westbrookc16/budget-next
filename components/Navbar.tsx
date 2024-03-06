@@ -34,7 +34,12 @@ const Navbar = () => {
         return;
       }
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}api/users/getSubscriptionStatus/${userId}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}api/users/getSubscriptionStatus/${userId}`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          mode: "cors",
+        }
       );
       //console.dir(res);
       const data = await res.json();
@@ -57,7 +62,12 @@ const Navbar = () => {
         return;
       }
       const link = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}api/create-portal-link/${customerId}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}api/create-portal-link/${customerId}`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          mode: "cors",
+        }
       );
 
       const data = await link.json();

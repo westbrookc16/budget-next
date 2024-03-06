@@ -57,7 +57,12 @@ export default function DisplayTransactions() {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_BASE_URL}api/transactions/${
             selectedCat().id
-          }`
+          }`,
+          {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            mode: "cors",
+          }
         );
         const data = await res.json();
         setTransactions(data);
