@@ -4,6 +4,7 @@ import { useFormStatus } from "react-dom";
 import { completeOnboarding } from "../actions/onboarding";
 import { useUser } from "@clerk/nextjs";
 import * as sentry from "@sentry/nextjs";
+import { redirect } from "next/navigation";
 function Submit() {
   const { pending } = useFormStatus();
   return (
@@ -23,13 +24,9 @@ export default function Onboarding() {
         action={async (data: FormData) => {
           const res = await completeOnboarding(data);
           console.log(`res: ${JSON.stringify(res)}`);
-          try {
-            await user?.reload();
-            router.push(`${process.env.NEXT_PUBLIC_BASE_URL}`);
-          } catch (e) {
-            console.error(e);
-            sentry.captureException(e);
-          }
+
+          await user?.reload();
+          redirect(`${process.env.NEXT_PUBLIC_BASE_URL}`);
         }}
       >
         Hi, <b>{user?.firstName}</b>, thanks for stopping by.
