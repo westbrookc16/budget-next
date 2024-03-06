@@ -16,8 +16,10 @@ export const completeOnboarding = async (formData: FormData) => {
       },
     });
     return { message: res.publicMetadata };
-  } catch (err) {
-    return { error: "There was an error updating the user metadata." };
+  } catch (err: any) {
+    return {
+      error: `There was an error updating the user metadata. ${err.message}`,
+    };
     sentry.captureException(err);
     console.error(err);
   }
