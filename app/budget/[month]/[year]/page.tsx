@@ -102,12 +102,7 @@ export default function HandleBudgetPage() {
   useEffect(() => {
     async function fetchData() {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}api/budget/${month}/${year}`,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          mode: "cors",
-        }
+        `${process.env.NEXT_PUBLIC_BASE_URL}api/budget/${month}/${year}`
       );
       const budget = await res.json();
       setBudget(budget);
@@ -125,12 +120,7 @@ export default function HandleBudgetPage() {
 
       try {
         const catsRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}api/categories/${budget.id}`,
-          {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-            mode: "cors",
-          }
+          `${process.env.NEXT_PUBLIC_BASE_URL}api/categories/${budget.id}`
         );
         const data = await catsRes.json();
 
