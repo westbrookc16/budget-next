@@ -45,7 +45,9 @@ const Navbar = () => {
     try {
       getSubscriptionStatus();
     } catch (err) {
-      console.error(err);
+      console.log(
+        `${process.env.NEXT_PUBLIC_BASE_URL}api/users/getSubscriptionStatus/${userId}`
+      );
       sentry.captureException(err);
     }
   }, [userId, setSubscriptionStatus, setCustomerId]);
