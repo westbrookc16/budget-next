@@ -21,7 +21,7 @@ export default function Onboarding() {
       <form
         action={async (data: FormData) => {
           const res = await completeOnboarding(data);
-
+          console.log(`res: ${res}`);
           await user?.reload();
           router.push(`${process.env.NEXT_PUBLIC_BASE_URL}`);
         }}
