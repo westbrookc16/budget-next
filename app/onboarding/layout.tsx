@@ -19,6 +19,7 @@ export default function RootLayout({
     }
   } catch (e: any) {
     console.error(e);
+    sentry.captureException(e);
   }
   return <>{children}</>;
 }
