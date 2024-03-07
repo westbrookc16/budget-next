@@ -25,8 +25,8 @@ export default function Onboarding() {
           const res = await completeOnboarding(data);
           console.log(`res: ${JSON.stringify(res)}`);
 
-          user?.reload();
-          redirect(`${process.env.NEXT_PUBLIC_BASE_URL}`);
+          await user?.reload();
+          router.push(`/`);
         }}
       >
         Hi, <b>{user?.firstName}</b>, thanks for stopping by.

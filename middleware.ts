@@ -27,17 +27,10 @@ export default authMiddleware({
     }
 
     // User is logged in and the route is protected - let them view.
-    if (
-      userId &&
-      !auth.isPublicRoute &&
-      sessionClaims.metadata?.onboardingComplete
-    )
-      return NextResponse.next();
+    if (userId && !auth.isPublicRoute) return NextResponse.next();
 
     // If the route is public, anyone can view it.
-    if (auth.isPublicRoute) {
-      return NextResponse.next();
-    }
+    if (auth.isPublicRoute) return NextResponse.next();
   },
 });
 
