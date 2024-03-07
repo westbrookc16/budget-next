@@ -26,7 +26,7 @@ export default function Onboarding() {
           console.log(`res: ${JSON.stringify(res)}`);
 
           await user?.reload();
-          router.push(`/`);
+          router.push(`${process.env.NEXT_PUBLIC_BASE_URL}`);
         }}
       >
         Hi, <b>{user?.firstName}</b>, thanks for stopping by.
