@@ -25,7 +25,7 @@ export default function Onboarding() {
           const res = await completeOnboarding(data);
           console.log(`res: ${JSON.stringify(res)}`);
 
-          await user?.reload();
+          user?.reload();
           redirect(`${process.env.NEXT_PUBLIC_BASE_URL}`);
         }}
       >
