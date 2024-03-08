@@ -22,6 +22,7 @@ export default function Onboarding() {
       <h1>Onboarding</h1>
       <form
         action={async (data: FormData) => {
+          "use server";
           try {
             const res = await completeOnboarding(data);
             console.log(`res: ${JSON.stringify(res)}`);
@@ -29,6 +30,7 @@ export default function Onboarding() {
             await user?.reload();
             console.log(`redirecting`);
             redirect(`${process.env.NEXT_PUBLIC_BASE_URL}`);
+            console.log(`redirecting done`);
           } catch (err) {
             console.error(err);
           }
