@@ -13,6 +13,19 @@ function Submit() {
     </button>
   );
 }
+
+const onboardingRedirect = async (data: FormData, user: any) => {
+  "use server";
+  const res = await completeOnboarding(data);
+  console.log(`res: ${JSON.stringify(res)}`);
+
+  await user?.reload();
+  const url = `${process.env.NEXT_PUBLIC_BASE_URL}`;
+  console.log(`redirecting: `, url);
+
+  redirect(url);
+};
+
 export default function Onboarding() {
   const { user } = useUser();
   const router = useRouter();
@@ -21,15 +34,8 @@ export default function Onboarding() {
     <div>
       <h1>Onboarding</h1>
       <form
-        action={async (data: FormData) => {
-          const res = await completeOnboarding(data);
-          console.log(`res: ${JSON.stringify(res)}`);
-
-          await user?.reload();
-          const url = `${process.env.NEXT_PUBLIC_BASE_URL}`;
-          console.log(`redirecting: `, url);
-
-          router.push("/");
+        action={(formData) => {
+          onboardingRedirect(formData, user);
         }}
       >
         Hi, <b>{user?.firstName}</b>, thanks for stopping by.
