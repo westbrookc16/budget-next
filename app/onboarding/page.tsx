@@ -22,18 +22,14 @@ export default function Onboarding() {
       <h1>Onboarding</h1>
       <form
         action={async (data: FormData) => {
-          "use server";
-          try {
-            const res = await completeOnboarding(data);
-            console.log(`res: ${JSON.stringify(res)}`);
+          const res = await completeOnboarding(data);
+          console.log(`res: ${JSON.stringify(res)}`);
 
-            await user?.reload();
-            console.log(`redirecting`);
-            redirect(`${process.env.NEXT_PUBLIC_BASE_URL}`);
-            console.log(`redirecting done`);
-          } catch (err) {
-            console.error(err);
-          }
+          await user?.reload();
+          const url = `${process.env.NEXT_PUBLIC_BASE_URL}`;
+          console.log(`redirecting: `, url);
+
+          router.push(url);
         }}
       >
         Hi, <b>{user?.firstName}</b>, thanks for stopping by.
