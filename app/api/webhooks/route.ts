@@ -9,6 +9,7 @@ import { stripe } from "@/utils/stripe/config";
   deleteProductRecord,
   deletePriceRecord,
 } from "@/utils/supabase/admin";*/
+import { clerkClient } from "@clerk/nextjs";
 const toDateTime = (secs: number) => {
   var t = new Date(+0); // Unix epoch start.
   t.setSeconds(secs);
@@ -42,8 +43,8 @@ const manageSubscriptionStatusChange = async (
     }
 
     // Create a new subscription record in the database
-    isSubscriptionCreated &&
-      (await prisma?.subscriptions.create({
+    if (isSubscriptionCreated) {
+      await prisma?.subscriptions.create({
         data: {
           subscription_id: subscriptionID,
           user_id: subscription.metadata.userId as string,
@@ -79,8 +80,26 @@ const manageSubscriptionStatusChange = async (
             ? toDateTime(subscription.trial_start as number).toISOString()
             : null,
         },
-      }));
+      });
+      clerkClient.users.updateUserMetadata(userId as string, {
+        publicMetadata: {
+          stripe: {
+            subscriptionStatus: subscription.status,
+            customer: customerID,
+          },
+        },
+      });
+    }
   } else {
+    //update clerk user metadata
+    clerkClient.users.updateUser(subscription.metadata.userId as string, {
+      publicMetadata: {
+        stripe: {
+          subscriptionStatus: subscription.status,
+          customer: customerID,
+        },
+      },
+    });
     //if the status is cancelled, delete the subscription
     if (subscription.status === "canceled") {
       await prisma?.subscriptions.delete({
@@ -88,6 +107,7 @@ const manageSubscriptionStatusChange = async (
       });
       return;
     }
+
     // Update the existing subscription record in the database
 
     await prisma?.subscriptions.update({

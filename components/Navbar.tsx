@@ -18,7 +18,7 @@ const Navbar = () => {
   const { isLoaded, isSignedIn, user } = useUser();
 
   //
-  const { userId } = useAuth();
+
   const subscriptionStatus = useGlobalState(
     (state) => state.subscriptionStatus
   );
@@ -28,34 +28,15 @@ const Navbar = () => {
   const customerId = useGlobalState((state) => state.customerId);
   const setCustomerId = useGlobalState((state) => state.setCustomerId);
   useEffect(() => {
-    async function getSubscriptionStatus() {
-      if (!userId) {
+    function getSubscriptionStatus() {
+      if (!isSignedIn) {
         setSubscriptionStatus("");
         return;
       }
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}api/users/getSubscriptionStatus/${userId}`,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          mode: "cors",
-        }
-      );
-      //console.dir(res);
-      const data = await res.json();
-      setSubscriptionStatus(data?.subscriptionStatus);
-      setCustomerId(data?.customerId);
-      //
+      setSubscriptionStatus(user?.publicMetadata?.subscriptionStatus as string);
+      setCustomerId(user?.publicMetadata?.customerId as string);
     }
-    try {
-      getSubscriptionStatus();
-    } catch (err) {
-      console.log(
-        `${process.env.NEXT_PUBLIC_BASE_URL}api/users/getSubscriptionStatus/${userId}`
-      );
-      sentry.captureException(err);
-    }
-  }, [userId, setSubscriptionStatus, setCustomerId]);
+  }, [user, setSubscriptionStatus, setCustomerId, isSignedIn]);
   useEffect(() => {
     async function getPortalLink() {
       if (!customerId) {
