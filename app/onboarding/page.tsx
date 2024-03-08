@@ -27,11 +27,12 @@ export default function Onboarding() {
           console.log(`res: ${JSON.stringify(res)}`);
 
           await user?.reload();
+
           const url = `${process.env.NEXT_PUBLIC_BASE_URL}`;
           console.log(`redirecting: `, url);
 
-          router.prefetch("/");
-          router.push("/");
+          router.prefetch(url);
+          router.push(url);
         }}
       >
         Hi, <b>{user?.firstName}</b>, thanks for stopping by.
