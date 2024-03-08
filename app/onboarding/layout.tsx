@@ -9,7 +9,7 @@ export default function RootLayout({
   // Check if a user has completed onboarding
   // If yes, redirect them to /dashboard
   if (auth().sessionClaims?.metadata.onboardingComplete === true) {
-    redirect("/dashboard");
+    redirect("/");
   }
 
   return <>{children}</>;
