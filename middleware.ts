@@ -23,6 +23,7 @@ export default authMiddleware({
     // Redirect them to the /onboading out to complete onboarding
     if (userId && !sessionClaims?.metadata?.onboardingComplete) {
       const onboardingUrl = new URL("/onboarding", req.url);
+      console.log(`Redirecting to ${onboardingUrl}`);
       return NextResponse.redirect(onboardingUrl);
     }
 

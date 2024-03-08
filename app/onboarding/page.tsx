@@ -26,6 +26,7 @@ export default function Onboarding() {
           console.log(`res: ${JSON.stringify(res)}`);
 
           await user?.reload();
+          console.log(`redirecting`);
           router.push(`${process.env.NEXT_PUBLIC_BASE_URL}`);
         }}
       >
