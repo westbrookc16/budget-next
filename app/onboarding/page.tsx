@@ -29,7 +29,7 @@ export default function Onboarding() {
           const url = `${process.env.NEXT_PUBLIC_BASE_URL}`;
           console.log(`redirecting: `, url);
 
-          router.push(url);
+          router.push("/");
         }}
       >
         Hi, <b>{user?.firstName}</b>, thanks for stopping by.
