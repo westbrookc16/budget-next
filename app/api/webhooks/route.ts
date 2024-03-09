@@ -27,6 +27,8 @@ const manageSubscriptionStatusChange = async (
   const dbSub = await prisma?.subscriptions.findUnique({
     where: { subscription_id: subscriptionID },
   });
+  //get the user
+  const user = await clerkClient.users.getUser(userId as string);
   if (isSubscriptionCreated) {
     //update metadata for subscription in stripe
 
@@ -81,10 +83,17 @@ const manageSubscriptionStatusChange = async (
             : null,
         },
       });
+
       clerkClient.users.updateUserMetadata(userId as string, {
         publicMetadata: {
+          ...user.publicMetadata,
           stripe: {
             subscriptionStatus: subscription.status,
+          },
+        },
+        privateMetadata: {
+          ...user.privateMetadata,
+          stripe: {
             customer: customerID,
           },
         },
@@ -92,14 +101,18 @@ const manageSubscriptionStatusChange = async (
     }
   } else {
     //update clerk user metadata
-    clerkClient.users.updateUser(subscription.metadata.userId as string, {
-      publicMetadata: {
-        stripe: {
-          subscriptionStatus: subscription.status,
-          customer: customerID,
+    clerkClient.users.updateUserMetadata(
+      subscription.metadata.userId as string,
+      {
+        publicMetadata: {
+          ...user.publicMetadata,
+          stripe: {
+            subscriptionStatus: subscription.status,
+            customer: customerID,
+          },
         },
-      },
-    });
+      }
+    );
     //if the status is cancelled, delete the subscription
     if (subscription.status === "canceled") {
       await prisma?.subscriptions.delete({

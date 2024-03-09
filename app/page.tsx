@@ -13,9 +13,9 @@ const HomePage = () => {
       HomePage
       {isLoaded &&
         isSignedIn &&
-        (subscriptionStatus === "none" || subscriptionStatus === "") && (
-          <CheckoutButton />
-        )}
+        (subscriptionStatus === "none" ||
+          subscriptionStatus === "" ||
+          !subscriptionStatus) && <CheckoutButton />}
     </div>
   );
 };

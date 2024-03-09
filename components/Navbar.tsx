@@ -1,6 +1,6 @@
 "use client";
 import * as sentry from "@sentry/nextjs";
-import { useAuth } from "@clerk/nextjs";
+
 import prisma from "@/utils/prisma";
 import { SignInButton, SignOutButton, UserButton } from "@clerk/nextjs";
 import { useState, useEffect, use } from "react";
@@ -9,14 +9,14 @@ import Link from "next/link";
 import logo from "@/assets/images/logo-white.png";
 import profileDefault from "@/assets/images/profile.png";
 import { FaGoogle } from "react-icons/fa";
-import { useUser } from "@clerk/nextjs";
+import { useUser, useSession } from "@clerk/nextjs";
 import styles from "@/css/styles.module.css";
 import { useGlobalState } from "./globalState";
 const Navbar = () => {
   const [portalLink, setPortalLink] = useState<string>("");
   const [providers, setProviders] = useState(null);
   const { isLoaded, isSignedIn, user } = useUser();
-
+  const { session } = useSession();
   //
 
   const subscriptionStatus = useGlobalState(
@@ -29,33 +29,42 @@ const Navbar = () => {
   const setCustomerId = useGlobalState((state) => state.setCustomerId);
   useEffect(() => {
     function getSubscriptionStatus() {
+      console.log(`isSignedIn=${isSignedIn}`);
       if (!isSignedIn) {
         setSubscriptionStatus("");
         return;
       }
-      setSubscriptionStatus(user?.publicMetadata?.subscriptionStatus as string);
-      setCustomerId(user?.publicMetadata?.customerId as string);
+
+      setSubscriptionStatus(
+        //@ts-ignore
+        user?.publicMetadata?.stripe?.subscriptionStatus as string
+      );
     }
+    getSubscriptionStatus();
   }, [user, setSubscriptionStatus, setCustomerId, isSignedIn]);
   useEffect(() => {
     async function getPortalLink() {
-      if (!customerId) {
+      if (!isSignedIn) {
         return;
       }
       const link = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}api/create-portal-link/${customerId}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}api/create-portal-link/${user.id}`,
         {
           method: "GET",
           headers: { "Content-Type": "application/json" },
           mode: "cors",
         }
       );
-
+      if (!link.ok) {
+        console.error("Error getting portal link");
+        setPortalLink("");
+        return;
+      }
       const data = await link.json();
       setPortalLink(data.url);
     }
     getPortalLink();
-  }, [customerId]);
+  }, [user?.id, isSignedIn]);
   return (
     <div>
       <div className={styles.navContainer}>
@@ -92,7 +101,7 @@ const Navbar = () => {
                   <div className={styles.link}>
                     <SignOutButton />
                     {(subscriptionStatus === "active" ||
-                      subscriptionStatus === "trialing") && (
+                      (subscriptionStatus === "trialing" && portalLink)) && (
                       <Link href={portalLink} className={styles.link}>
                         Manage Subscription
                       </Link>
