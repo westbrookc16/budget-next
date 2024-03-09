@@ -2,13 +2,7 @@ import prisma from "@/utils/prisma";
 import * as sentry from "@sentry/nextjs";
 import Stripe from "stripe";
 import { stripe } from "@/utils/stripe/config";
-/*import {
-  upsertProductRecord,
-  upsertPriceRecord,
-  manageSubscriptionStatusChange,
-  deleteProductRecord,
-  deletePriceRecord,
-} from "@/utils/supabase/admin";*/
+
 import { clerkClient } from "@clerk/nextjs";
 const toDateTime = (secs: number) => {
   var t = new Date(+0); // Unix epoch start.
@@ -28,7 +22,8 @@ const manageSubscriptionStatusChange = async (
     where: { subscription_id: subscriptionID },
   });
   //get the user
-  const user = await clerkClient.users.getUser(userId as string);
+  let user: any = {};
+  if (userId) user = await clerkClient.users.getUser(userId);
   if (isSubscriptionCreated) {
     //update metadata for subscription in stripe
 
@@ -83,44 +78,60 @@ const manageSubscriptionStatusChange = async (
             : null,
         },
       });
-
-      clerkClient.users.updateUserMetadata(userId as string, {
-        publicMetadata: {
-          ...user.publicMetadata,
-          stripe: {
-            subscriptionStatus: subscription.status,
+      if (userId !== "")
+        clerkClient.users.updateUserMetadata(userId as string, {
+          publicMetadata: {
+            ...user.publicMetadata,
+            stripe: {
+              subscriptionStatus: subscription.status,
+            },
           },
-        },
-        privateMetadata: {
-          ...user.privateMetadata,
-          stripe: {
-            customer: customerID,
+          privateMetadata: {
+            ...user.privateMetadata,
+            stripe: {
+              customer: customerID,
+            },
           },
-        },
-      });
+        });
     }
   } else {
-    //update clerk user metadata
-    clerkClient.users.updateUserMetadata(
-      subscription.metadata.userId as string,
-      {
-        publicMetadata: {
-          ...user.publicMetadata,
-          stripe: {
-            subscriptionStatus: subscription.status,
-            customer: customerID,
-          },
-        },
-      }
-    );
     //if the status is cancelled, delete the subscription
     if (subscription.status === "canceled") {
       await prisma?.subscriptions.delete({
         where: { subscription_id: subscriptionID },
       });
+      //update clerk user metadata
+      clerkClient.users.updateUserMetadata(
+        subscription.metadata.userId as string,
+        {
+          publicMetadata: {
+            ...user.publicMetadata,
+            stripe: {
+              subscriptionStatus: "none",
+            },
+          },
+
+          privateMetadata: {
+            ...user.privateMetadata,
+            stripe: {
+              customer: null,
+            },
+          },
+        }
+      );
       return;
     }
-
+    //update clerk user metadata
+    if (userId !== "")
+      clerkClient.users.updateUserMetadata(userId, {
+        publicMetadata: {
+          ...user.publicMetadata,
+          stripe: {
+            subscriptionStatus: subscription.status,
+            customer: customerID,
+          },
+        },
+      });
     // Update the existing subscription record in the database
 
     await prisma?.subscriptions.update({
@@ -210,7 +221,7 @@ export async function POST(req: Request) {
           await manageSubscriptionStatusChange(
             subscription.id,
             subscription.customer as string,
-            userId,
+            subscription.metadata.userId as string,
             false
           );
           break;
@@ -233,6 +244,10 @@ export async function POST(req: Request) {
       }
     } catch (error: any) {
       sentry.captureException(error);
+      console.error(`userId=${userId}`);
+      console.error(
+        `❌ Webhook handler failed: ${error.message} ${event.type}`
+      );
       return new Response(
         `Webhook handler failed. View your Next.js function logs.${error.message}`,
         {

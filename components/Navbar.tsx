@@ -101,8 +101,11 @@ const Navbar = () => {
                   <div className={styles.link}>
                     <SignOutButton />
                     {(subscriptionStatus === "active" ||
-                      (subscriptionStatus === "trialing" && portalLink)) && (
-                      <Link href={portalLink} className={styles.link}>
+                      (subscriptionStatus === "trialing" && isSignedIn)) && (
+                      <Link
+                        href={`${process.env.NEXT_PUBLIC_BASE_URL}api/create-portal-link/${user.id}`}
+                        className={styles.link}
+                      >
                         Manage Subscription
                       </Link>
                     )}

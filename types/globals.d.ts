@@ -6,7 +6,7 @@ declare global {
       stripe: { subscriptionStatus: string; customer: string };
     };
   }
-  interface user extends user {
+  interface user extends User {
     publicMetadata: {
       stripe?: {
         subscriptionStatus: string;
