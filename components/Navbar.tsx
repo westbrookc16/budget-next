@@ -42,29 +42,7 @@ const Navbar = () => {
     }
     getSubscriptionStatus();
   }, [user, setSubscriptionStatus, setCustomerId, isSignedIn]);
-  useEffect(() => {
-    async function getPortalLink() {
-      if (!isSignedIn) {
-        return;
-      }
-      const link = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}api/create-portal-link/${user.id}`,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          mode: "cors",
-        }
-      );
-      if (!link.ok) {
-        console.error("Error getting portal link");
-        setPortalLink("");
-        return;
-      }
-      const data = await link.json();
-      setPortalLink(data.url);
-    }
-    getPortalLink();
-  }, [user?.id, isSignedIn]);
+
   return (
     <div>
       <div className={styles.navContainer}>
