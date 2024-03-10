@@ -3,7 +3,7 @@ import * as sentry from "@sentry/nextjs";
 
 import prisma from "@/utils/prisma";
 import { SignInButton, SignOutButton, UserButton } from "@clerk/nextjs";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "@/assets/images/logo-white.png";
@@ -12,6 +12,7 @@ import { FaGoogle } from "react-icons/fa";
 import { useUser, useSession } from "@clerk/nextjs";
 import styles from "@/css/styles.module.css";
 import { useGlobalState } from "./globalState";
+import CheckoutButton from "./stripe-payment";
 const Navbar = () => {
   const [portalLink, setPortalLink] = useState<string>("");
   const [providers, setProviders] = useState(null);
@@ -52,7 +53,7 @@ const Navbar = () => {
               <Link href="/" className={styles.navLeftLink}>
                 <Image
                   src={logo}
-                  alt="logo"
+                  alt="Budget Management Home Logo"
                   width={45}
                   height={45}
                   className={styles.logo}
@@ -79,14 +80,19 @@ const Navbar = () => {
                   <div className={styles.link}>
                     <SignOutButton />
                     {(subscriptionStatus === "active" ||
-                      (subscriptionStatus === "trialing" && isSignedIn)) && (
-                      <Link
-                        href={`${process.env.NEXT_PUBLIC_BASE_URL}api/create-portal-link/${user.id}`}
-                        className={styles.link}
-                      >
-                        Manage Subscription
-                      </Link>
-                    )}
+                      subscriptionStatus === "trialing") &&
+                      isSignedIn && (
+                        <Link
+                          href={`${process.env.NEXT_PUBLIC_BASE_URL}api/create-portal-link/${user.id}`}
+                          className={styles.link}
+                        >
+                          Manage Subscription
+                        </Link>
+                      )}
+                    {(subscriptionStatus === "none" ||
+                      subscriptionStatus === "" ||
+                      !subscriptionStatus) &&
+                      isSignedIn && <CheckoutButton />}
                   </div>
                 </>
               ) : (
