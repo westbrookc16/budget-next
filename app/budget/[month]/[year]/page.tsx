@@ -25,6 +25,24 @@ import { Oval } from "react-loader-spinner";
 import { useContext } from "react";
 export default function HandleBudgetPage() {
   //use global state context
+  const SubmitButton = () => (
+    <input
+      type="submit"
+      value="Submit"
+      disabled={pending}
+      className="bg-blue-600 h-9 w-100 text-sm p-2 rounded text-white mt-4 cursor-pointer hover:bg-blue-700 transition transition-duration: 500ms;"
+      name="submit"
+    />
+  );
+  const CopyMonthsButton = () => (
+    <input
+      type="submit"
+      value="Copy Categories from Previous Month"
+      disabled={pending}
+      className="bg-blue-600 h-9 w-100 text-sm p-2 rounded text-white mt-4 cursor-pointer hover:bg-blue-700 transition transition-duration: 500ms;"
+      name="submit"
+    />
+  );
   const state: globalState = useGlobalState();
   const {
     budget,
@@ -86,35 +104,38 @@ export default function HandleBudgetPage() {
   useEffect(() => {
     setTotal(cats.reduce((acc: number, cat: category) => acc + cat.amount, 0));
   }, [setTotal, cats]);
-  const status = useFormStatus();
+  const { pending } = useFormStatus();
 
   //display notification if formState has changed
   useEffect(() => {
     if ("message" in formState && formState.message) {
       setSuccess(true);
       setRefreshBudget(new Date());
+      //refresh the categories
+      if (formState.message.includes("categories")) {
+        setRefreshDate(new Date());
+      }
+      //clear the message after 5 seconds
       setTimeout(() => {
         setSuccess(false);
       }, 5000);
     }
-  }, [formState]);
+  }, [formState, setRefreshDate]);
 
   useEffect(() => {
+    setLoading(true);
     async function fetchData() {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}api/budget/${month}/${year}`
       );
       const budget = await res.json();
       setBudget(budget);
-      setLoading(false);
-    }
-    fetchData();
-  }, [setBudget, setLoading, month, year, refreshBudget]);
+      if (!budget.id || budget.id === "") {
+        //clear categories if no budget is retrieved
 
-  useEffect(() => {
-    async function fetchData() {
-      if (budget.id === "") {
         setCats([]);
+        setTotal(0);
+        setLoading(false);
         return;
       }
 
@@ -129,9 +150,20 @@ export default function HandleBudgetPage() {
         console.error(e);
         sentry.captureException(e);
       }
+      setLoading(false);
     }
     fetchData();
-  }, [setCats, budget.id, refreshDate]);
+  }, [
+    setBudget,
+    setLoading,
+    month,
+    year,
+    refreshBudget,
+    setCats,
+    setTotal,
+    refreshDate,
+  ]);
+
   const refreshGrid = () => {
     const newDate = new Date();
     setRefreshDate(newDate);
@@ -150,7 +182,7 @@ export default function HandleBudgetPage() {
           width="40"
           color="#4299e1"
           secondaryColor="#4299e1"
-          ariaLabel="oval-loading"
+          ariaLabel="loading"
           wrapperStyle={{}}
           wrapperClass=""
         />
@@ -160,7 +192,9 @@ export default function HandleBudgetPage() {
 
   return (
     <div>
-      <h1 className="text-center text-xl font-semibold p-5">Budget </h1>
+      <h1 className="text-center text-xl font-semibold p-5">
+        Budget Management
+      </h1>
       <div className=" flex justify-center items-center p-5">
         <form
           action={formAction}
@@ -177,14 +211,12 @@ export default function HandleBudgetPage() {
             dataItemKey="value"
             label="Month"
           />
-
           <input
             type="hidden"
             id="realMonth"
             name="realMonth"
             value={realMonth}
           />
-
           <DropDownList
             id="ddlYear"
             name="year"
@@ -193,7 +225,6 @@ export default function HandleBudgetPage() {
             onChange={changeBudget}
             label="Year"
           />
-
           <NumericTextBox
             id="income"
             format="c2"
@@ -205,12 +236,8 @@ export default function HandleBudgetPage() {
             label="Income"
           />
           <input type="hidden" name="budgetId" value={budget.id} />
-          <input
-            type="submit"
-            value="submit"
-            disabled={status.pending}
-            className="bg-blue-600 h-9 w-100 text-sm p-2 rounded text-white mt-4 cursor-pointer hover:bg-blue-700 transition transition-duration: 500ms;"
-          />
+          <SubmitButton />
+          &nbsp;{budget.id && <CopyMonthsButton />}
         </form>
       </div>
       <div role="status">
@@ -264,7 +291,8 @@ export default function HandleBudgetPage() {
             .
           </b>
         </div>
-        <div aria-live="polite">
+
+        <div aria-live="polite" aria-busy={loading}>
           You have{" "}
           <b>
             {new Intl.NumberFormat("en-US", {
