@@ -7,7 +7,7 @@ declare global {
     };
   }
   interface UserPublicMetadata {
-    stripe: { subscriptionStatus: string };
+    stripe?: { subscriptionStatus: string };
   }
 
   interface UserPrivateMetadata {
