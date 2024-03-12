@@ -24,6 +24,12 @@ const manageSubscriptionStatusChange = async (
   //get the user
   let user: any = {};
   if (userId) user = await clerkClient.users.getUser(userId);
+  if (!user) {
+    console.error(`❌ User not found for subscription ${subscriptionID}`);
+    return new Response(`User not found for subscription ${subscriptionID}`, {
+      status: 200,
+    });
+  }
   if (isSubscriptionCreated) {
     //update metadata for subscription in stripe
 
