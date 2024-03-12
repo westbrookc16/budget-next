@@ -2,8 +2,14 @@
 
 import Head from "next/head";
 import * as Sentry from "@sentry/nextjs";
-
+import { useUser } from "@clerk/nextjs";
 export default function Page() {
+  const { user } = useUser();
+  if (user)
+    Sentry.setUser({
+      email: user.primaryEmailAddress.emailAddress,
+      id: user.id,
+    });
   return (
     <div>
       <Head>
@@ -49,15 +55,18 @@ export default function Page() {
             margin: "18px",
           }}
           onClick={() => {
-            Sentry.startSpan({
-              name: 'Example Frontend Span',
-              op: 'test'
-            }, async () => {
-              const res = await fetch("/api/sentry-example-api");
-              if (!res.ok) {
-                throw new Error("Sentry Example Frontend Error");
+            Sentry.startSpan(
+              {
+                name: "Example Frontend Span",
+                op: "test",
+              },
+              async () => {
+                const res = await fetch("/api/sentry-example-api");
+                if (!res.ok) {
+                  throw new Error("Sentry Example Frontend Error");
+                }
               }
-            });
+            );
           }}
         >
           Throw error!
@@ -65,7 +74,10 @@ export default function Page() {
 
         <p>
           Next, look for the error on the{" "}
-          <a href="https://na-yt.sentry.io/issues/?project=4506811028799488">Issues Page</a>.
+          <a href="https://na-yt.sentry.io/issues/?project=4506811028799488">
+            Issues Page
+          </a>
+          .
         </p>
         <p style={{ marginTop: "24px" }}>
           For more information, see{" "}

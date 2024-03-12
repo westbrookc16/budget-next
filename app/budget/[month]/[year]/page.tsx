@@ -59,6 +59,7 @@ export default function HandleBudgetPage() {
     setCats,
     total,
     setTotal,
+    isActive,
   } = state;
   const initialState: any = { message: "" };
   const [formState, formAction] = useFormState(updateBudget, initialState);
@@ -241,7 +242,7 @@ export default function HandleBudgetPage() {
           />
           <input type="hidden" name="budgetId" value={budget.id} />
           <SubmitButton />
-          &nbsp;{budget.id && <CopyMonthsButton />}
+          &nbsp;{budget.id && isActive() && <CopyMonthsButton />}
         </form>
       </div>
       <div role="status">
