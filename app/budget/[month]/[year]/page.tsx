@@ -26,22 +26,26 @@ import { useContext } from "react";
 export default function HandleBudgetPage() {
   //use global state context
   const SubmitButton = () => (
-    <input
+    <button
       type="submit"
       value="Submit"
       disabled={pending}
       className="bg-blue-600 h-9 w-100 text-sm p-2 rounded text-white mt-4 cursor-pointer hover:bg-blue-700 transition transition-duration: 500ms;"
       name="submit"
-    />
+    >
+      Submit
+    </button>
   );
   const CopyMonthsButton = () => (
-    <input
+    <button
       type="submit"
       value="Copy Categories from Previous Month"
       disabled={pending}
       className="bg-blue-600 h-9 w-100 text-sm p-2 rounded text-white mt-4 cursor-pointer hover:bg-blue-700 transition transition-duration: 500ms;"
       name="submit"
-    />
+    >
+      Copy Categories from Previous Month
+    </button>
   );
   const state: globalState = useGlobalState();
   const {
@@ -123,7 +127,7 @@ export default function HandleBudgetPage() {
   }, [formState, setRefreshDate]);
 
   useEffect(() => {
-    setLoading(true);
+    //setLoading(true);
     async function fetchData() {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}api/budget/${month}/${year}`
