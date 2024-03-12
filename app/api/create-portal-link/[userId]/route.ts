@@ -9,7 +9,7 @@ export async function GET(req: Request, { params }: any) {
   try {
     const { userId } = params;
     const user = await clerkClient.users.getUser(userId);
-    //@ts-ignore
+
     const customerId = user.privateMetadata.stripe.customer;
     if (!customerId) {
       console.log(`No customer found for user ${userId}`);

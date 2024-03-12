@@ -30,14 +30,12 @@ const Navbar = () => {
   const setCustomerId = useGlobalState((state) => state.setCustomerId);
   useEffect(() => {
     function getSubscriptionStatus() {
-      console.log(`isSignedIn=${isSignedIn}`);
       if (!isSignedIn) {
         setSubscriptionStatus("");
         return;
       }
 
       setSubscriptionStatus(
-        //@ts-ignore
         user?.publicMetadata?.stripe?.subscriptionStatus as string
       );
     }
