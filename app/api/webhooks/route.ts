@@ -23,7 +23,15 @@ const manageSubscriptionStatusChange = async (
   });
   //get the user
   let user: any = {};
-  if (userId) user = await clerkClient.users.getUser(userId);
+  if (userId)
+    try {
+      user = await clerkClient.users.getUser(userId);
+    } catch (e) {
+      console.error(e);
+      return new Response(`User not found for subscription ${subscriptionID}`, {
+        status: 200,
+      });
+    }
   if (!user) {
     console.error(`❌ User not found for subscription ${subscriptionID}`);
     return new Response(`User not found for subscription ${subscriptionID}`, {
