@@ -94,7 +94,7 @@ export default function HandleBudgetPage() {
       router.push(`/budget/${e.target.value.value}/${ddlYear}`);
     } else {
       setDdlYear(e.target.value);
-      router.push(`/budget/${ddlMonth}/${e.target.value}`);
+      router.push(`/budget/${realMonth}/${e.target.value}`);
     }
   };
   const [addCat, setAddCat] = useState<boolean>(false);

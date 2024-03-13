@@ -6,7 +6,7 @@ import type { globalState } from "@/types/globalState";
 import AddTransaction from "@/components/addTransaction";
 import { Dialog, DialogActionsBar } from "@progress/kendo-react-dialogs";
 import {
-  GridCellProps,
+  GridCustomCellProps,
   GridColumn as Column,
 } from "@progress/kendo-react-grid";
 import { deleteTransaction } from "@/app/actions/transactions";
@@ -84,34 +84,40 @@ export default function DisplayTransactions() {
         <Column
           field="date"
           title="Date"
-          cell={(props: GridCellProps) => (
-            <td>{new Date(props.dataItem["date"]).toDateString()}</td>
-          )}
+          cells={{
+            data: (props: GridCustomCellProps) => (
+              <td {...props.tdProps}>
+                {new Date(props.dataItem["date"]).toDateString()}
+              </td>
+            ),
+          }}
         />
         <Column field="description" title="Description" />
         <Column
           title="Actions"
-          cell={(props: GridCellProps) => (
-            <td>
-              <button
-                onClick={() => {
-                  setShowEditTransaction(true);
-                  setEditTransaction(props.dataItem);
-                }}
-              >
-                Edit
-              </button>
-              &nbsp;
-              <button
-                onClick={() => {
-                  setShowDeleteTransaction(true);
-                  setTransactionToBeDeleted(props.dataItem);
-                }}
-              >
-                Delete
-              </button>
-            </td>
-          )}
+          cells={{
+            data: (props: GridCustomCellProps) => (
+              <td {...props.tdProps}>
+                <button
+                  onClick={() => {
+                    setShowEditTransaction(true);
+                    setEditTransaction(props.dataItem);
+                  }}
+                >
+                  Edit
+                </button>
+                &nbsp;
+                <button
+                  onClick={() => {
+                    setShowDeleteTransaction(true);
+                    setTransactionToBeDeleted(props.dataItem);
+                  }}
+                >
+                  Delete
+                </button>
+              </td>
+            ),
+          }}
         />
       </Grid>
       <button onClick={() => setShowAddTransaction(true)}>

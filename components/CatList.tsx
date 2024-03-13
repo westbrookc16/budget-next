@@ -8,7 +8,7 @@ import AddCategory from "./AddCategory";
 import {
   Grid,
   GridColumn as Column,
-  GridCellProps,
+  GridCustomCellProps,
 } from "@progress/kendo-react-grid";
 import { Checkbox } from "@progress/kendo-react-inputs";
 import { useFormState } from "react-dom";
@@ -24,19 +24,19 @@ export default function CatList({ budgetID, cats, refreshGrid }: any) {
 
   //state for the add category dialog
   const [addCat, setAddCat] = useState(false);
-  const editTransactionsCell = (props: GridCellProps) => {
+  const editTransactionsCell = (props: GridCustomCellProps) => {
     return (
-      <td>
+      <td {...props.tdProps} colSpan={1}>
         <Link href={`/transactions/${props.dataItem.id}`}>
           Edit Transactions
         </Link>
       </td>
     );
   };
-  const checkboxCell = (props: GridCellProps) => {
+  const checkboxCell = (props: GridCustomCellProps) => {
     const isRecurring = props.dataItem[props.field ?? ""];
     return (
-      <td>
+      <td {...props.tdProps} colSpan={1}>
         <Checkbox disabled checked={isRecurring} />
       </td>
     );
@@ -59,9 +59,9 @@ export default function CatList({ budgetID, cats, refreshGrid }: any) {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const editCell = (props: GridCellProps) => {
+  const editCell = (props: GridCustomCellProps) => {
     return (
-      <td>
+      <td {...props.tdProps} colSpan={1}>
         <button
           className="font-semibold text-blue-500 p-2 rounded transition transition-delay: 300ms; hover:bg-blue-200"
           onClick={(e) => {
@@ -74,9 +74,9 @@ export default function CatList({ budgetID, cats, refreshGrid }: any) {
       </td>
     );
   };
-  const deleteCell = (props: GridCellProps) => {
+  const deleteCell = (props: GridCustomCellProps) => {
     return (
-      <td>
+      <td {...props.tdProps} colSpan={1}>
         <button
           className="font-semibold text-red-500 p-2 rounded transition transition-delay: 300ms; hover:bg-red-200"
           onClick={(e) => {
@@ -103,7 +103,7 @@ export default function CatList({ budgetID, cats, refreshGrid }: any) {
   return (
     <div className="flex justify-center items-center flex-col p-5">
       <h1 className="text-xl font-semibold p-5">Categories</h1>
-      <Grid data={cats} className=" xl:w-2/3 md:w-full">
+      <Grid data={cats} className=" xl:w-2/3 md:w-full" navigatable={true}>
         <Column field="name" title="Name" className="text-lg" />
         <Column
           field="amount"
@@ -111,21 +111,32 @@ export default function CatList({ budgetID, cats, refreshGrid }: any) {
           title="Amount"
           className="text-lg"
         />
-        <Column field="isRecurring" title="Is Recurring" cell={checkboxCell} />
+        <Column
+          field="isRecurring"
+          title="Is Recurring"
+          cells={{ data: checkboxCell }}
+        />
         {isActive() && (
           <Column
             field="totalSpent"
             title="Total Spent"
             format="{0:c2}"
-            cell={(e: GridCellProps) => (
-              <td>{formatCurrency(e.dataItem["totalSpent"] ?? 0)}</td>
-            )}
+            cells={{
+              data: (e: GridCustomCellProps) => (
+                <td {...e.tdProps} colSpan={1}>
+                  {formatCurrency(e.dataItem["totalSpent"] ?? 0)}
+                </td>
+              ),
+            }}
           />
         )}
-        <Column title="Edit" cell={editCell} />
-        <Column title="Delete" cell={deleteCell} />
+        <Column title="Edit" cells={{ data: editCell }} />
+        <Column title="Delete" cells={{ data: deleteCell }} />
         {isActive() && (
-          <Column title="Edit Transactions" cell={editTransactionsCell} />
+          <Column
+            title="Edit Transactions"
+            cells={{ data: editTransactionsCell }}
+          />
         )}
       </Grid>
       {isEditing && (
