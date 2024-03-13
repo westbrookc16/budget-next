@@ -2,7 +2,7 @@
 import * as sentry from "@sentry/nextjs";
 import dynamic from "next/dynamic";
 import type { transaction } from "@/types/transaction";
-import type { globalState } from "@/types/globalState";
+
 import AddTransaction from "@/components/addTransaction";
 import { Dialog, DialogActionsBar } from "@progress/kendo-react-dialogs";
 import {
@@ -14,7 +14,8 @@ import type { category } from "@/types/category";
 import React, { useCallback, useEffect, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import { useParams } from "next/navigation";
-import { useGlobalState } from "@/components/globalState";
+import { useAtom, useAtomValue } from "jotai";
+import { transactionsAtom, categoriesAtom } from "@/types/atoms";
 
 export default function DisplayTransactions() {
   const Grid: any = dynamic(
@@ -24,13 +25,8 @@ export default function DisplayTransactions() {
       ssr: false,
     }
   );
-  const cats = useGlobalState((state: globalState) => state.cats);
-  const transactions = useGlobalState(
-    (state: globalState) => state.transactions
-  );
-  const setTransactions = useGlobalState(
-    (state: globalState) => state.setTransactions
-  );
+  const cats = useAtomValue(categoriesAtom);
+  const [transactions, setTransactions] = useAtom(transactionsAtom);
   const { categoryId } = useParams();
   //
   const selectedCat = useCallback(

@@ -1,5 +1,7 @@
 "use client";
-import { useGlobalState } from "./globalState";
+
+import { useAtomValue } from "jotai";
+import { isActiveAtom } from "@/types/atoms";
 import { formatCurrency } from "@/utils/money";
 import type { category } from "@/types/category";
 import { Dialog, DialogActionsBar } from "@progress/kendo-react-dialogs";
@@ -97,8 +99,7 @@ export default function CatList({ budgetID, cats, refreshGrid }: any) {
   const closeDeleteDialog = () => {
     setIsDeleting(false);
   };
-
-  const isActive = useGlobalState((state) => state.isActive);
+  const isActive = useAtomValue(isActiveAtom);
 
   return (
     <div className="flex justify-center items-center flex-col p-5">
@@ -116,7 +117,7 @@ export default function CatList({ budgetID, cats, refreshGrid }: any) {
           title="Is Recurring"
           cells={{ data: checkboxCell }}
         />
-        {isActive() && (
+        {isActive && (
           <Column
             field="totalSpent"
             title="Total Spent"
@@ -132,7 +133,7 @@ export default function CatList({ budgetID, cats, refreshGrid }: any) {
         )}
         <Column title="Edit" cells={{ data: editCell }} />
         <Column title="Delete" cells={{ data: deleteCell }} />
-        {isActive() && (
+        {isActive && (
           <Column
             title="Edit Transactions"
             cells={{ data: editTransactionsCell }}

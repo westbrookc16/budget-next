@@ -1,9 +1,18 @@
 "use client";
 import * as sentry from "@sentry/nextjs";
-import { useGlobalState } from "@/components/globalState";
+import { useAtom, useAtomValue } from "jotai";
+import {
+  isActiveAtom,
+  loadingAtom,
+  refreshDateAtom,
+  budgetAtom,
+  categoriesAtom,
+  totalAtom,
+} from "@/types/atoms";
+
 import type { category } from "@/types/category";
 import { Fade } from "@progress/kendo-react-animation";
-import type { globalState } from "@/types/globalState";
+
 import {
   Notification,
   NotificationGroup,
@@ -25,6 +34,10 @@ import { Oval } from "react-loader-spinner";
 import { useContext } from "react";
 export default function HandleBudgetPage() {
   //use global state context
+  const isActive = useAtomValue(isActiveAtom);
+  const { pending } = useFormStatus();
+  const [loading, setLoading] = useAtom(loadingAtom);
+  const [refreshDate, setRefreshDate] = useAtom(refreshDateAtom);
   const SubmitButton = () => (
     <button
       type="submit"
@@ -47,20 +60,9 @@ export default function HandleBudgetPage() {
       Copy Categories from Previous Month
     </button>
   );
-  const state: globalState = useGlobalState();
-  const {
-    budget,
-    setBudget,
-    loading,
-    setLoading,
-    refreshDate,
-    setRefreshDate,
-    cats,
-    setCats,
-    total,
-    setTotal,
-    isActive,
-  } = state;
+  const [budget, setBudget] = useAtom(budgetAtom);
+  const [cats, setCats] = useAtom(categoriesAtom);
+  const total = useAtomValue(totalAtom);
   const initialState: any = { message: "" };
   const [formState, formAction] = useFormState(updateBudget, initialState);
 
@@ -107,12 +109,6 @@ export default function HandleBudgetPage() {
     setTotalLeft(budget.income - Number(total));
   }, [budget, cats, total]);
   useEffect(() => {
-    setTotal(cats.reduce((acc: number, cat: category) => acc + cat.amount, 0));
-  }, [setTotal, cats]);
-  const { pending } = useFormStatus();
-
-  //display notification if formState has changed
-  useEffect(() => {
     if ("message" in formState && formState.message) {
       setSuccess(true);
       setRefreshBudget(new Date());
@@ -139,7 +135,7 @@ export default function HandleBudgetPage() {
         //clear categories if no budget is retrieved
 
         setCats([]);
-        setTotal(0);
+
         setLoading(false);
         return;
       }
@@ -158,16 +154,7 @@ export default function HandleBudgetPage() {
       setLoading(false);
     }
     fetchData();
-  }, [
-    setBudget,
-    setLoading,
-    month,
-    year,
-    refreshBudget,
-    setCats,
-    setTotal,
-    refreshDate,
-  ]);
+  }, [setBudget, setLoading, month, year, refreshBudget, setCats, refreshDate]);
 
   const refreshGrid = () => {
     const newDate = new Date();
@@ -242,7 +229,7 @@ export default function HandleBudgetPage() {
           />
           <input type="hidden" name="budgetId" value={budget.id} />
           <SubmitButton />
-          &nbsp;{budget.id && isActive() && <CopyMonthsButton />}
+          &nbsp;{budget.id && isActive && <CopyMonthsButton />}
         </form>
       </div>
       <div role="status">

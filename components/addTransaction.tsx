@@ -1,5 +1,7 @@
 "use client";
 import type { category } from "@/types/category";
+import { categoriesAtom } from "@/types/atoms";
+import { useAtom } from "jotai";
 import { useFormState } from "react-dom";
 import type { formState } from "@/types/formstate";
 import {
@@ -19,7 +21,6 @@ import { Hint } from "@progress/kendo-react-labels";
 import { Input } from "@progress/kendo-react-inputs";
 import type { globalState } from "@/types/globalState";
 import type { transaction } from "@/types/transaction";
-import { useGlobalState } from "@/components/globalState";
 
 export default function AddTransaction({
   categoryId,
@@ -36,8 +37,7 @@ export default function AddTransaction({
 }) {
   const initialState: formState = { message: "", timestamp: new Date() };
   const [realCategory, setRealCategory] = useState<String>("");
-  const cats = useGlobalState((state: any) => state.cats);
-  const setCats = useGlobalState((state: any) => state.setCats);
+  const [cats, setCats] = useAtom(categoriesAtom);
   const [selectedCat, setSelectedCat] = useState(() =>
     categoryId !== ""
       ? cats.filter((v: category) => v.id === categoryId)[0]

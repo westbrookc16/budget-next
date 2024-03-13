@@ -11,23 +11,20 @@ import profileDefault from "@/assets/images/profile.png";
 import { FaGoogle } from "react-icons/fa";
 import { useUser, useSession } from "@clerk/nextjs";
 import styles from "@/css/styles.module.css";
-import { useGlobalState } from "./globalState";
+import { useAtom, useAtomValue } from "jotai";
 import CheckoutButton from "./stripe-payment";
+import { subscriptionStatusAtom } from "@/types/atoms";
 const Navbar = () => {
   const [portalLink, setPortalLink] = useState<string>("");
   const [providers, setProviders] = useState(null);
   const { isLoaded, isSignedIn, user } = useUser();
-  const { session } = useSession();
+
   //
 
-  const subscriptionStatus = useGlobalState(
-    (state) => state.subscriptionStatus
+  const [subscriptionStatus, setSubscriptionStatus] = useAtom(
+    subscriptionStatusAtom
   );
-  const setSubscriptionStatus = useGlobalState(
-    (state) => state.setSubscriptionStatus
-  );
-  const customerId = useGlobalState((state) => state.customerId);
-  const setCustomerId = useGlobalState((state) => state.setCustomerId);
+
   useEffect(() => {
     function getSubscriptionStatus() {
       if (!isSignedIn) {
@@ -40,7 +37,7 @@ const Navbar = () => {
       );
     }
     getSubscriptionStatus();
-  }, [user, setSubscriptionStatus, setCustomerId, isSignedIn]);
+  }, [user, setSubscriptionStatus, isSignedIn]);
 
   return (
     <div>
