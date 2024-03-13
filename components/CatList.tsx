@@ -104,7 +104,7 @@ export default function CatList({ budgetID, cats, refreshGrid }: any) {
   return (
     <div className="flex justify-center items-center flex-col p-5">
       <h1 className="text-xl font-semibold p-5">Categories</h1>
-      <Grid data={cats} className=" xl:w-2/3 md:w-full" navigatable={true}>
+      <Grid data={cats} className=" xl:w-2/3 md:w-full">
         <Column field="name" title="Name" className="text-lg" />
         <Column
           field="amount"
