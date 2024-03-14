@@ -18,6 +18,7 @@ import { useAtom, useAtomValue } from "jotai";
 import { transactionsAtom, categoriesAtom } from "@/types/atoms";
 
 export default function DisplayTransactions() {
+  const [lastElement, setLastElement] = useState<Element>();
   const Grid: any = dynamic(
     () =>
       import("@progress/kendo-react-grid").then((module) => module.Grid) as any,
@@ -83,26 +84,35 @@ export default function DisplayTransactions() {
           cells={{
             data: (props: GridCustomCellProps) => (
               <td {...props.tdProps}>
-                {new Date(props.dataItem["date"]).toDateString()}
+                {new Date(props.dataItem["date"]).toLocaleDateString()}
               </td>
             ),
           }}
         />
         <Column field="description" title="Description" />
         <Column
-          title="Actions"
+          title="Edit"
           cells={{
             data: (props: GridCustomCellProps) => (
               <td {...props.tdProps}>
                 <button
                   onClick={() => {
+                    setLastElement(document.activeElement ?? undefined);
                     setShowEditTransaction(true);
                     setEditTransaction(props.dataItem);
                   }}
                 >
                   Edit
                 </button>
-                &nbsp;
+              </td>
+            ),
+          }}
+        />
+        <Column
+          title="Delete"
+          cells={{
+            data: (props: GridCustomCellProps) => (
+              <td {...props.tdProps}>
                 <button
                   onClick={() => {
                     setShowDeleteTransaction(true);
@@ -143,7 +153,11 @@ export default function DisplayTransactions() {
             categoryId={selectedCat()?.id}
             mode="Update"
             transaction={editTransaction}
-            closeDialog={() => setShowEditTransaction(false)}
+            closeDialog={() => {
+              setShowEditTransaction(false);
+              //@ts-ignore
+              lastElement?.focus();
+            }}
             refreshGrid={() => setRefreshDate(new Date())}
           />
         </Dialog>
