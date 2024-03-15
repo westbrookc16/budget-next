@@ -51,6 +51,12 @@
   transition: 300ms ease-in-out;
   margin-right: 40px;
 }
+.navRightLinks > .linkSub {
+  color: rgb(206, 206, 206);
+  text-decoration: none;
+  transition: 300ms ease-in-out;
+  margin-right: 40px;
+}
 .navRightLinks > .homeLink {
   color: rgb(206, 206, 206);
   text-decoration: none;
@@ -104,6 +110,9 @@
   }
   .navRightLinks > .link {
     margin-right: 25px;
+  }
+  .navRightLinks > .linkSub {
+    display: none;
   }
 }
 @media (max-width: 768px) {

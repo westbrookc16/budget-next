@@ -1,17 +1,18 @@
-import { authMiddleware } from "@clerk/nextjs";
-import { redirectToSignIn } from "@clerk/nextjs/server";
-import { NextRequest, NextResponse } from "next/server";
+import { authMiddleware } from '@clerk/nextjs';
+import { redirectToSignIn } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 // This example protects all routes including api/trpc routes
 // Please edit this to allow other routes to be public as needed.
 // See https://clerk.com/docs/references/nextjs/auth-middleware for more information about configuring your Middleware
 export default authMiddleware({
-  publicRoutes: ["/", "/api/webhooks", "/api/clerk/webhooks"],
+  publicRoutes: ['/', '/api/webhooks', '/api/clerk/webhooks'],
   afterAuth: async (auth, req: NextRequest) => {
     const { userId, sessionClaims } = auth;
+    // console.log('session', sessionClaims);
 
     // For user visiting /onboarding, don't try and redirect
-    if (userId && req.nextUrl.pathname === "/onboarding") {
+    if (userId && req.nextUrl.pathname === '/onboarding') {
       return NextResponse.next();
     }
 
@@ -22,7 +23,7 @@ export default authMiddleware({
     // Catch users who doesn't have `onboardingComplete: true` in PublicMetata
     // Redirect them to the /onboading out to complete onboarding
     if (userId && !sessionClaims?.metadata?.onboardingComplete) {
-      const onboardingUrl = new URL("/onboarding", req.url);
+      const onboardingUrl = new URL('/onboarding', req.url);
       console.log(`Redirecting to ${onboardingUrl}`);
       return NextResponse.redirect(onboardingUrl);
     }
@@ -36,5 +37,5 @@ export default authMiddleware({
 });
 
 export const config = {
-  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+  matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
 };

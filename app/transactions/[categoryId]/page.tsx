@@ -1,27 +1,24 @@
-"use client";
-import * as sentry from "@sentry/nextjs";
-import dynamic from "next/dynamic";
-import type { transaction } from "@/types/transaction";
-
-import AddTransaction from "@/components/addTransaction";
-import { Dialog, DialogActionsBar } from "@progress/kendo-react-dialogs";
+'use client';
+import * as sentry from '@sentry/nextjs';
+import dynamic from 'next/dynamic';
+import type { transaction } from '@/types/transaction';
+import AddTransaction from '@/components/addTransaction';
+import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import {
   GridCustomCellProps,
   GridColumn as Column,
-} from "@progress/kendo-react-grid";
-import { deleteTransaction } from "@/app/actions/transactions";
-import type { category } from "@/types/category";
-import React, { useCallback, useEffect, useState } from "react";
-import { useFormState, useFormStatus } from "react-dom";
-import { useParams } from "next/navigation";
-import { useAtom, useAtomValue } from "jotai";
-import { transactionsAtom, categoriesAtom } from "@/types/atoms";
+} from '@progress/kendo-react-grid';
+import { deleteTransaction } from '@/app/actions/transactions';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import { useAtom, useAtomValue } from 'jotai';
+import { transactionsAtom, categoriesAtom } from '@/types/atoms';
 
 export default function DisplayTransactions() {
   const [lastElement, setLastElement] = useState<Element>();
   const Grid: any = dynamic(
     () =>
-      import("@progress/kendo-react-grid").then((module) => module.Grid) as any,
+      import('@progress/kendo-react-grid').then((module) => module.Grid) as any,
     {
       ssr: false,
     }
@@ -32,7 +29,7 @@ export default function DisplayTransactions() {
   //
   const selectedCat = useCallback(
     () =>
-      categoryId !== "" ? cats.filter((v) => v.id === categoryId)[0] : cats[0],
+      categoryId !== '' ? cats.filter((v) => v.id === categoryId)[0] : cats[0],
     [categoryId, cats]
   );
   const [refreshDate, setRefreshDate] = useState<Date>(new Date());
@@ -56,9 +53,9 @@ export default function DisplayTransactions() {
             selectedCat().id
           }`,
           {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-            mode: "cors",
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            mode: 'cors',
           }
         );
         const data = await res.json();
@@ -76,22 +73,22 @@ export default function DisplayTransactions() {
     <div>
       <h1>Transactions for {selectedCat()?.name}</h1>
       <Grid data={transactions}>
-        <Column field="name" title="Name" />
-        <Column field="amount" title="Amount" format="{0:c2}" />
+        <Column field='name' title='Name' />
+        <Column field='amount' title='Amount' format='{0:c2}' />
         <Column
-          field="date"
-          title="Date"
+          field='date'
+          title='Date'
           cells={{
             data: (props: GridCustomCellProps) => (
               <td {...props.tdProps}>
-                {new Date(props.dataItem["date"]).toLocaleDateString()}
+                {new Date(props.dataItem['date']).toLocaleDateString()}
               </td>
             ),
           }}
         />
-        <Column field="description" title="Description" />
+        <Column field='description' title='Description' />
         <Column
-          title="Edit"
+          title='Edit'
           cells={{
             data: (props: GridCustomCellProps) => (
               <td {...props.tdProps}>
@@ -109,7 +106,7 @@ export default function DisplayTransactions() {
           }}
         />
         <Column
-          title="Delete"
+          title='Delete'
           cells={{
             data: (props: GridCustomCellProps) => (
               <td {...props.tdProps}>
@@ -133,15 +130,15 @@ export default function DisplayTransactions() {
         <Dialog>
           <AddTransaction
             transaction={{
-              name: "",
-              description: "",
+              name: '',
+              description: '',
               amount: 0,
               date: new Date(),
               category: selectedCat().id,
-              id: "",
+              id: '',
             }}
             categoryId={selectedCat()?.id}
-            mode="Add"
+            mode='Add'
             closeDialog={() => setShowAddTransaction(false)}
             refreshGrid={() => setRefreshDate(new Date())}
           />
@@ -151,7 +148,7 @@ export default function DisplayTransactions() {
         <Dialog>
           <AddTransaction
             categoryId={selectedCat()?.id}
-            mode="Update"
+            mode='Update'
             transaction={editTransaction}
             closeDialog={() => {
               setShowEditTransaction(false);
@@ -165,7 +162,7 @@ export default function DisplayTransactions() {
       {showDeleteTransaction && (
         <Dialog>
           <h1>
-            Are you sure you want to delete{" "}
+            Are you sure you want to delete{' '}
             <b>{transactionToBeDeleted?.name}?</b>
           </h1>
           <DialogActionsBar>
@@ -175,7 +172,7 @@ export default function DisplayTransactions() {
             <form
               action={async (data: FormData) => {
                 await deleteTransaction(
-                  { timestamp: new Date(), message: "" },
+                  { timestamp: new Date(), message: '' },
                   data
                 );
                 setShowDeleteTransaction(false);
@@ -183,17 +180,17 @@ export default function DisplayTransactions() {
               }}
             >
               <input
-                type="hidden"
-                name="id"
+                type='hidden'
+                name='id'
                 value={transactionToBeDeleted?.id}
               />
               <input
-                type="hidden"
-                name="amount"
+                type='hidden'
+                name='amount'
                 value={transactionToBeDeleted?.amount}
               />
-              <input type="hidden" value={categoryId} name="realCategory" />
-              <button type="submit">Yes</button>
+              <input type='hidden' value={categoryId} name='realCategory' />
+              <button type='submit'>Yes</button>
             </form>
           </DialogActionsBar>
         </Dialog>
