@@ -1,6 +1,21 @@
 "use server";
 import * as sentry from "@sentry/nextjs";
 import prisma from "@/utils/prisma";
+export async function getCategoriesByMonthYear(month: number, year: number) {
+  try {
+    const res = await prisma.budgets.findFirst({ where: { month, year } });
+    if (!res) {
+      return [];
+    }
+    const res2 = await prisma.categories.findMany({
+      where: { budgetId: res.id },
+    });
+    return res2;
+  } catch (e) {
+    sentry.captureException(e);
+    return [];
+  }
+}
 export async function updateCategory(initialState: any, data: FormData) {
   const id = String(data.get("id"));
   const action = data.get("action");

@@ -1,4 +1,5 @@
 "use client";
+import { getCategoriesByMonthYear } from "@/app/actions/categories";
 import * as sentry from "@sentry/nextjs";
 import type { Metadata } from "next";
 
@@ -59,11 +60,20 @@ export default function HandleBudgetPage() {
     );
     return res.json();
   };
-  const catInfo = useQuery({
+  /*const catInfo = useQuery({
     queryKey: ["categories", budget?.id],
     queryFn: async () => getCategories(budget.id),
 
     enabled: !!budget?.id,
+  });*/
+  const catInfo = useQuery({
+    queryKey: ["categories", month, year],
+    queryFn: async () => {
+      return getCategoriesByMonthYear(
+        parseInt(month as string),
+        parseInt(year as string)
+      );
+    },
   });
   useEffect(() => {
     setIncome(budget?.income ?? 0);
