@@ -13,6 +13,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model messages {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  message String
+  email   String
+  name    String
+}
+
 model Budgets {
   id     String @id @default(auto()) @map("_id") @db.ObjectId
   month  Int

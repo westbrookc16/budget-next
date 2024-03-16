@@ -1,5 +1,6 @@
 "use client";
 import * as sentry from "@sentry/nextjs";
+import type { Metadata } from "next";
 
 /*import {
   isActiveAtom,
@@ -30,6 +31,11 @@ import { budget } from "@/types/budget";
 import { category } from "@/types/category";
 import { useUser } from "@clerk/nextjs";
 
+/*export function generateMetadata({ params }): Metadata {
+  //
+  const { month, year } = params;
+  return { title: `Budget for ${month}/${year}` };
+}*/
 export default function HandleBudgetPage() {
   //use global state context
   const { user } = useUser();
@@ -39,6 +45,7 @@ export default function HandleBudgetPage() {
     subscriptionStatus === "active" || subscriptionStatus === "trialing";
   const [income, setIncome] = useState<number>(0);
   const { month, year } = useParams();
+
   const budgetInfo = useQuery({
     queryKey: ["budget", month, year],
     queryFn: () => {
@@ -125,11 +132,18 @@ export default function HandleBudgetPage() {
   const changeBudget = (e: any) => {
     if (e.target.name === "month") {
       setRealMonth(e.target.value.value);
-      router.push(`/budget/${e.target.value.value}/${ddlYear}`);
+      setDdlMonth(e.target.value);
+      //router.push(`/budget/${e.target.value.value}/${ddlYear}`);
     } else {
       setDdlYear(e.target.value);
-      router.push(`/budget/${realMonth}/${e.target.value}`);
+      //router.push(`/budget/${realMonth}/${e.target.value}`);
     }
+  };
+  useEffect(() => {
+    document.title = `Budget for ${month}/${year}`;
+  }, [month, year]);
+  const selectBudget = () => {
+    router.push(`/budget/${realMonth}/${ddlYear}`);
   };
   const [success, setSuccess] = useState<boolean>(false);
 
@@ -207,6 +221,7 @@ export default function HandleBudgetPage() {
             onChange={changeBudget}
             label="Year"
           />
+          <button onClick={selectBudget}>Select</button>
           <NumericTextBox
             id="income"
             format="c2"
