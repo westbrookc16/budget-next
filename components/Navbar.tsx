@@ -58,6 +58,11 @@ const Navbar = () => {
                             Manage Subscription
                           </Link>
                         </div>
+                        <div className={styles.link}>
+                          <Link href="/contact" className={styles.link}>
+                            Contact
+                          </Link>
+                        </div>
                       </>
                     )}
                   <div className={styles.linkSub}>

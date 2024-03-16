@@ -72,6 +72,7 @@ export default function HandleBudgetPage() {
   const total = cats?.reduce((acc, cat) => acc + cat.amount, 0) ?? 0;
 
   const loading = budgetInfo.isFetching || catInfo.isFetching;
+  //const loading = false;
   //const [loading, setLoading] = useAtom(loadingAtom);
   //const [refreshDate, setRefreshDate] = useAtom(refreshDateAtom);
   const SubmitButton = () => {
@@ -156,13 +157,20 @@ export default function HandleBudgetPage() {
   }, [budget, cats, total]);*/
 
   useEffect(() => {
-    if ("message" in formState && formState.message) {
+    if (
+      "message" in formState &&
+      formState.message &&
+      !budgetInfo.isFetching &&
+      !catInfo.isFetching
+    ) {
       setSuccess(true);
+
       budgetInfo.refetch();
       //refresh the categories
-      if (formState.message.includes("categories")) {
+      if (formState.message.includes("categories") && success) {
         catInfo.refetch();
       }
+
       //clear the message after 5 seconds
       setTimeout(() => {
         setSuccess(false);
@@ -177,14 +185,14 @@ export default function HandleBudgetPage() {
     return response.json();
   };
 
-  if (loading) {
+  /*if (loading) {
     return (
       //implement a loader
       <div className="flex justify-center items-center mt-80">
         <Loader />
       </div>
     );
-  }
+  }*/
 
   return (
     <div>
@@ -232,12 +240,12 @@ export default function HandleBudgetPage() {
             }}
             label="Income"
           />
-          <input type="hidden" name="budgetId" value={budget.id} />
+          <input type="hidden" name="budgetId" value={budget?.id} />
           <SubmitButton />
-          &nbsp;{budget.id && isActive && <CopyMonthsButton />}
+          &nbsp;{budget?.id && isActive && <CopyMonthsButton />}
         </form>
       </div>
-      <div aria-live="assertive" aria-atomic="false" aria-busy={loading}>
+      <div aria-busy={loading} role="status">
         <NotificationGroup
           style={{
             right: 0,
@@ -262,9 +270,9 @@ export default function HandleBudgetPage() {
         </NotificationGroup>
       </div>
       <div aria-live="off">
-        {budget.id && (
+        {budget?.id && (
           <CatList
-            budgetID={budget.id}
+            budgetID={budget?.id}
             cats={cats}
             refreshGrid={catInfo.refetch}
           />
@@ -288,7 +296,7 @@ export default function HandleBudgetPage() {
             {new Intl.NumberFormat("en-US", {
               style: "currency",
               currency: "USD",
-            }).format(budget.income ?? 0)}
+            }).format(budget?.income ?? 0)}
             .
           </b>
         </div>
@@ -299,11 +307,16 @@ export default function HandleBudgetPage() {
             {new Intl.NumberFormat("en-US", {
               style: "currency",
               currency: "USD",
-            }).format((budget.income ?? 0) - (total ?? 0))}{" "}
+            }).format((budget?.income ?? 0) - (total ?? 0))}{" "}
           </b>
           left to budget.
         </div>
       </div>
+      {loading && (
+        <div className="flex justify-center items-center mt-80">
+          <Loader />
+        </div>
+      )}
     </div>
   );
 }
