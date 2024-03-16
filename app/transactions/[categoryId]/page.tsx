@@ -1,38 +1,54 @@
-'use client';
-import * as sentry from '@sentry/nextjs';
-import dynamic from 'next/dynamic';
-import type { transaction } from '@/types/transaction';
-import AddTransaction from '@/components/addTransaction';
-import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
+"use client";
+import * as sentry from "@sentry/nextjs";
+import dynamic from "next/dynamic";
+import type { transaction } from "@/types/transaction";
+import AddTransaction from "@/components/addTransaction";
+import { Dialog, DialogActionsBar } from "@progress/kendo-react-dialogs";
 import {
   GridCustomCellProps,
   GridColumn as Column,
-} from '@progress/kendo-react-grid';
-import { deleteTransaction } from '@/app/actions/transactions';
-import React, { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { useAtom, useAtomValue } from 'jotai';
-import { transactionsAtom, categoriesAtom } from '@/types/atoms';
+} from "@progress/kendo-react-grid";
+import { deleteTransaction } from "@/app/actions/transactions";
+import React, { useCallback, useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
+import { category } from "@/types/category";
+import { useQuery } from "@tanstack/react-query";
 
 export default function DisplayTransactions() {
+  const { categoryId } = useParams();
+  const getCategories = async (id: string) => {
+    //get the current category id so we can get the categoreis from that budget
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}api/categories/getbyid/${id}`
+    );
+    const category = (await res.json()) as category;
+    //get the categories for the current budget
+    const res2 = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}api/categories/${category.budgetId}`
+    );
+    return res2.json();
+  };
+  const catInfo = useQuery({
+    queryKey: ["categories", categoryId],
+    queryFn: () => getCategories(categoryId as string),
+  });
+  const cats: category[] = catInfo.data as category[];
   const [lastElement, setLastElement] = useState<Element>();
   const Grid: any = dynamic(
     () =>
-      import('@progress/kendo-react-grid').then((module) => module.Grid) as any,
+      import("@progress/kendo-react-grid").then((module) => module.Grid) as any,
     {
       ssr: false,
     }
   );
-  const cats = useAtomValue(categoriesAtom);
-  const [transactions, setTransactions] = useAtom(transactionsAtom);
-  const { categoryId } = useParams();
+
   //
   const selectedCat = useCallback(
     () =>
-      categoryId !== '' ? cats.filter((v) => v.id === categoryId)[0] : cats[0],
+      categoryId !== "" ? cats.filter((v) => v.id === categoryId)[0] : cats[0],
     [categoryId, cats]
   );
-  const [refreshDate, setRefreshDate] = useState<Date>(new Date());
 
   const [showAddTransaction, setShowAddTransaction] = useState<Boolean>(false);
   const [showEditTransaction, setShowEditTransaction] =
@@ -42,53 +58,52 @@ export default function DisplayTransactions() {
   const [transactionToBeDeleted, setTransactionToBeDeleted] =
     useState<transaction>();
   const [editTransaction, setEditTransaction] = useState<transaction>();
-  useEffect(() => {
-    async function fetchData() {
-      //get a list of transactions for the selected category
-      try {
-        if (!selectedCat()) return;
+  const getTransactions = async () => {
+    //get a list of transactions for the selected category
+    try {
+      if (!selectedCat()) return;
 
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}api/transactions/${
-            selectedCat().id
-          }`,
-          {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-            mode: 'cors',
-          }
-        );
-        const data = await res.json();
-        setTransactions(data);
-        //get a list of categories
-      } catch (e) {
-        console.error(e);
-        sentry.captureException(e);
-      }
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}api/transactions/${
+          selectedCat().id
+        }`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          mode: "cors",
+        }
+      );
+      return res.json();
+    } catch (e) {
+      console.error(e);
+      sentry.captureException(e);
     }
-    fetchData();
-  }, [setTransactions, selectedCat, refreshDate]);
-
+  };
+  const transactionInfo = useQuery({
+    queryKey: ["transactions", categoryId],
+    queryFn: getTransactions,
+  });
+  const transactions: transaction[] = transactionInfo.data as transaction[];
   return (
     <div>
       <h1>Transactions for {selectedCat()?.name}</h1>
       <Grid data={transactions}>
-        <Column field='name' title='Name' />
-        <Column field='amount' title='Amount' format='{0:c2}' />
+        <Column field="name" title="Name" />
+        <Column field="amount" title="Amount" format="{0:c2}" />
         <Column
-          field='date'
-          title='Date'
+          field="date"
+          title="Date"
           cells={{
             data: (props: GridCustomCellProps) => (
               <td {...props.tdProps}>
-                {new Date(props.dataItem['date']).toLocaleDateString()}
+                {new Date(props.dataItem["date"]).toLocaleDateString()}
               </td>
             ),
           }}
         />
-        <Column field='description' title='Description' />
+        <Column field="description" title="Description" />
         <Column
-          title='Edit'
+          title="Edit"
           cells={{
             data: (props: GridCustomCellProps) => (
               <td {...props.tdProps}>
@@ -106,7 +121,7 @@ export default function DisplayTransactions() {
           }}
         />
         <Column
-          title='Delete'
+          title="Delete"
           cells={{
             data: (props: GridCustomCellProps) => (
               <td {...props.tdProps}>
@@ -130,17 +145,19 @@ export default function DisplayTransactions() {
         <Dialog>
           <AddTransaction
             transaction={{
-              name: '',
-              description: '',
+              name: "",
+              description: "",
               amount: 0,
               date: new Date(),
               category: selectedCat().id,
-              id: '',
+              id: "",
             }}
             categoryId={selectedCat()?.id}
-            mode='Add'
+            mode="Add"
             closeDialog={() => setShowAddTransaction(false)}
-            refreshGrid={() => setRefreshDate(new Date())}
+            refreshGrid={() => {
+              transactionInfo.refetch();
+            }}
           />
         </Dialog>
       )}
@@ -148,21 +165,21 @@ export default function DisplayTransactions() {
         <Dialog>
           <AddTransaction
             categoryId={selectedCat()?.id}
-            mode='Update'
+            mode="Update"
             transaction={editTransaction}
             closeDialog={() => {
               setShowEditTransaction(false);
               //@ts-ignore
               lastElement?.focus();
             }}
-            refreshGrid={() => setRefreshDate(new Date())}
+            refreshGrid={() => transactionInfo.refetch()}
           />
         </Dialog>
       )}
       {showDeleteTransaction && (
         <Dialog>
           <h1>
-            Are you sure you want to delete{' '}
+            Are you sure you want to delete{" "}
             <b>{transactionToBeDeleted?.name}?</b>
           </h1>
           <DialogActionsBar>
@@ -172,25 +189,25 @@ export default function DisplayTransactions() {
             <form
               action={async (data: FormData) => {
                 await deleteTransaction(
-                  { timestamp: new Date(), message: '' },
+                  { timestamp: new Date(), message: "" },
                   data
                 );
                 setShowDeleteTransaction(false);
-                setRefreshDate(new Date());
+                transactionInfo.refetch();
               }}
             >
               <input
-                type='hidden'
-                name='id'
+                type="hidden"
+                name="id"
                 value={transactionToBeDeleted?.id}
               />
               <input
-                type='hidden'
-                name='amount'
+                type="hidden"
+                name="amount"
                 value={transactionToBeDeleted?.amount}
               />
-              <input type='hidden' value={categoryId} name='realCategory' />
-              <button type='submit'>Yes</button>
+              <input type="hidden" value={categoryId} name="realCategory" />
+              <button type="submit">Yes</button>
             </form>
           </DialogActionsBar>
         </Dialog>

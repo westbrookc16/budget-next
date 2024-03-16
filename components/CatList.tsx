@@ -1,7 +1,6 @@
 "use client";
+import { useUser } from "@clerk/nextjs";
 
-import { useAtomValue } from "jotai";
-import { isActiveAtom } from "@/types/atoms";
 import { formatCurrency } from "@/utils/money";
 import type { category } from "@/types/category";
 import { Dialog, DialogActionsBar } from "@progress/kendo-react-dialogs";
@@ -18,6 +17,9 @@ import { updateCategory } from "@/app/actions/categories";
 import Link from "next/link";
 
 export default function CatList({ budgetID, cats, refreshGrid }: any) {
+  const { user } = useUser();
+  const subscriptionStatus: string | undefined =
+    user?.publicMetadata?.stripe?.subscriptionStatus;
   const originalState = { message: "" };
   const [deleteFormState, deleteAction] = useFormState(
     updateCategory,
@@ -102,7 +104,8 @@ export default function CatList({ budgetID, cats, refreshGrid }: any) {
   const closeDeleteDialog = () => {
     setIsDeleting(false);
   };
-  const isActive = useAtomValue(isActiveAtom);
+  const isActive =
+    subscriptionStatus === "active" || subscriptionStatus === "trialing";
 
   return (
     <div className="flex justify-center items-center flex-col p-5">

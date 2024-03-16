@@ -1,32 +1,16 @@
-'use client';
+"use client";
 
-import styles from '@/css/footer.module.css';
-import { useUser } from '@clerk/nextjs';
-import { useAtom } from 'jotai';
-import { useEffect } from 'react';
-import { subscriptionStatusAtom } from '@/types/atoms';
-import CheckoutButton from '../stripe-payment';
+import styles from "@/css/footer.module.css";
+import { useUser } from "@clerk/nextjs";
+
+import { useEffect } from "react";
+
+import CheckoutButton from "../stripe-payment";
 
 const Footer = () => {
   const { isLoaded, isSignedIn, user } = useUser();
 
-  const [subscriptionStatus, setSubscriptionStatus] = useAtom(
-    subscriptionStatusAtom
-  );
-
-  useEffect(() => {
-    function getSubscriptionStatus() {
-      if (!isSignedIn) {
-        setSubscriptionStatus('');
-        return;
-      }
-
-      setSubscriptionStatus(
-        user?.publicMetadata?.stripe?.subscriptionStatus as string
-      );
-    }
-    getSubscriptionStatus();
-  }, [user, setSubscriptionStatus, isSignedIn]);
+  const subscriptionStatus = user?.publicMetadata?.stripe?.subscriptionStatus;
 
   return (
     <footer className={styles.footer}>
@@ -36,8 +20,8 @@ const Footer = () => {
         </small>
         {isLoaded && isSignedIn && (
           <div className={styles.link}>
-            {(subscriptionStatus === 'none' ||
-              subscriptionStatus === '' ||
+            {(subscriptionStatus === "none" ||
+              subscriptionStatus === "" ||
               !subscriptionStatus) &&
               isSignedIn && <CheckoutButton />}
           </div>

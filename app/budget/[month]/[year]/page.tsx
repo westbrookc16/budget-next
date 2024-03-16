@@ -1,17 +1,17 @@
 "use client";
 import * as sentry from "@sentry/nextjs";
-import { useAtom, useAtomValue } from "jotai";
-import {
+
+/*import {
   isActiveAtom,
   loadingAtom,
   refreshDateAtom,
   budgetAtom,
   categoriesAtom,
   totalAtom,
-} from "@/types/atoms";
+} from "@/types/atoms";*/
 
 import { Fade } from "@progress/kendo-react-animation";
-
+import { useQuery } from "@tanstack/react-query";
 import {
   Notification,
   NotificationGroup,
@@ -26,13 +26,47 @@ import CatList from "@/components/CatList";
 import { NumericTextBox } from "@progress/kendo-react-inputs";
 
 import Loader from "@/common/Loader";
+import { budget } from "@/types/budget";
+import { category } from "@/types/category";
+import { useUser } from "@clerk/nextjs";
 
 export default function HandleBudgetPage() {
   //use global state context
-  const isActive = useAtomValue(isActiveAtom);
+  const { user } = useUser();
+  const subscriptionStatus: string | undefined =
+    user?.publicMetadata?.stripe?.subscriptionStatus;
+  const isActive =
+    subscriptionStatus === "active" || subscriptionStatus === "trialing";
+  const [income, setIncome] = useState<number>(0);
+  const { month, year } = useParams();
+  const budgetInfo = useQuery({
+    queryKey: ["budget", month, year],
+    queryFn: () => {
+      return getBudget(month as string, year as string);
+    },
+  });
+  const budget = budgetInfo.data as budget;
+  const getCategories = async (budgetId: string) => {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/categories/${budgetId}`
+    );
+    return res.json();
+  };
+  const catInfo = useQuery({
+    queryKey: ["categories", budget?.id],
+    queryFn: async () => getCategories(budget.id),
 
-  const [loading, setLoading] = useAtom(loadingAtom);
-  const [refreshDate, setRefreshDate] = useAtom(refreshDateAtom);
+    enabled: !!budget?.id,
+  });
+  useEffect(() => {
+    setIncome(budget?.income ?? 0);
+  }, [budget]);
+  const cats: category[] = catInfo.data as category[];
+  const total = cats?.reduce((acc, cat) => acc + cat.amount, 0) ?? 0;
+
+  const loading = budgetInfo.isFetching || catInfo.isFetching;
+  //const [loading, setLoading] = useAtom(loadingAtom);
+  //const [refreshDate, setRefreshDate] = useAtom(refreshDateAtom);
   const SubmitButton = () => {
     const { pending } = useFormStatus();
     return (
@@ -61,14 +95,11 @@ export default function HandleBudgetPage() {
       </button>
     );
   };
-  const [budget, setBudget] = useAtom(budgetAtom);
-  const [cats, setCats] = useAtom(categoriesAtom);
-  const total = useAtomValue(totalAtom);
+
   const initialState: any = { message: "" };
   const [formState, formAction] = useFormState(updateBudget, initialState);
 
   const router = useRouter();
-  const { month, year } = useParams();
 
   const [realMonth, setRealMonth] = useState(month);
 
@@ -105,62 +136,31 @@ export default function HandleBudgetPage() {
   const [totalLeft, setTotalLeft] = useState<number>(0);
   const [refreshBudget, setRefreshBudget] = useState<Date>(new Date());
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (!budget) return;
     setTotalLeft(budget.income - Number(total));
-  }, [budget, cats, total]);
+  }, [budget, cats, total]);*/
 
   useEffect(() => {
     if ("message" in formState && formState.message) {
       setSuccess(true);
-      setRefreshBudget(new Date());
+      budgetInfo.refetch();
       //refresh the categories
       if (formState.message.includes("categories")) {
-        setRefreshDate(new Date());
+        catInfo.refetch();
       }
       //clear the message after 5 seconds
       setTimeout(() => {
         setSuccess(false);
       }, 5000);
     }
-  }, [formState, setRefreshDate]);
-
-  useEffect(() => {
-    setLoading(true);
-    async function fetchData() {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}api/budget/${month}/${year}`
-      );
-      const budget = await res.json();
-      setBudget(budget);
-      if (!budget.id || budget.id === "") {
-        //clear categories if no budget is retrieved
-
-        setCats([]);
-
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const catsRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}api/categories/${budget.id}`
-        );
-        const data = await catsRes.json();
-
-        setCats(data);
-      } catch (e) {
-        console.error(e);
-        sentry.captureException(e);
-      }
-      setLoading(false);
-    }
-    fetchData();
-  }, [setBudget, setLoading, month, year, refreshBudget, setCats, refreshDate]);
-
-  const refreshGrid = () => {
-    const newDate = new Date();
-    setRefreshDate(newDate);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formState]);
+  const getBudget = async (month: string, year: string) => {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}api/budget/${month}/${year}`
+    );
+    return response.json();
   };
 
   if (loading) {
@@ -211,9 +211,9 @@ export default function HandleBudgetPage() {
             id="income"
             format="c2"
             name="income"
-            value={budget.income}
+            value={income ?? 0}
             onChange={(e) => {
-              setBudget({ ...budget, income: e.value ?? 0 });
+              setIncome(e.value ?? 0);
             }}
             label="Income"
           />
@@ -248,7 +248,11 @@ export default function HandleBudgetPage() {
       </div>
       <div aria-live="off">
         {budget.id && (
-          <CatList budgetID={budget.id} cats={cats} refreshGrid={refreshGrid} />
+          <CatList
+            budgetID={budget.id}
+            cats={cats}
+            refreshGrid={catInfo.refetch}
+          />
         )}
       </div>
       <div className="text-md p-5 flex justify-center items-center flex-col gap-3 md:text-xl">
