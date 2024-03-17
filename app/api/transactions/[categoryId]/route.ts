@@ -6,5 +6,8 @@ export async function GET(request: Request, { params }: any) {
       categoryId: categoryId,
     },
   });
+  if (!transactions) {
+    return new Response(JSON.stringify([]));
+  }
   return new Response(JSON.stringify(transactions));
 }

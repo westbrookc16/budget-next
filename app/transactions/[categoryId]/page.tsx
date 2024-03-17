@@ -20,10 +20,11 @@ export default function DisplayTransactions() {
   const getCategories = async (id: string) => {
     //get the current category id so we can get the categoreis from that budget
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}api/categories/getbyid/${id}`
+      `${process.env.NEXT_PUBLIC_BASE_URL}api/categories/getById/${id}`
     );
     const category = (await res.json()) as category;
     //get the categories for the current budget
+
     const res2 = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}api/categories/${category.budgetId}`
     );
@@ -46,7 +47,7 @@ export default function DisplayTransactions() {
   //
   const selectedCat = useCallback(
     () =>
-      categoryId !== "" ? cats.filter((v) => v.id === categoryId)[0] : cats[0],
+      categoryId !== "" ? cats?.filter((v) => v.id === categoryId)[0] : cats[0],
     [categoryId, cats]
   );
 
@@ -59,14 +60,12 @@ export default function DisplayTransactions() {
     useState<transaction>();
   const [editTransaction, setEditTransaction] = useState<transaction>();
   const getTransactions = async () => {
+    console.log(`in get transactions`);
     //get a list of transactions for the selected category
     try {
-      if (!selectedCat()) return;
-
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}api/transactions/${
-          selectedCat().id
-        }`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}api/transactions/${categoryId}`,
+
         {
           method: "GET",
           headers: { "Content-Type": "application/json" },
@@ -82,6 +81,7 @@ export default function DisplayTransactions() {
   const transactionInfo = useQuery({
     queryKey: ["transactions", categoryId],
     queryFn: getTransactions,
+    enabled: !!categoryId,
   });
   const transactions: transaction[] = transactionInfo.data as transaction[];
   return (
