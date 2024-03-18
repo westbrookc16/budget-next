@@ -1,7 +1,7 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
 import type { category } from "@/types/category";
-import { categoriesAtom } from "@/types/atoms";
+//import { categoriesAtom } from "@/types/atoms";
 
 import type { formState } from "@/types/formstate";
 import {
