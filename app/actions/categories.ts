@@ -1,9 +1,15 @@
-'use server';
-import * as sentry from '@sentry/nextjs';
-import prisma from '@/utils/prisma';
+"use server";
+import invariant from "tiny-invariant";
+import * as sentry from "@sentry/nextjs";
+import prisma from "@/utils/prisma";
+import { auth } from "@clerk/nextjs";
 export async function getCategoriesByMonthYear(month: number, year: number) {
   try {
-    const res = await prisma.budgets.findFirst({ where: { month, year } });
+    const { userId } = auth() ?? "";
+    invariant(userId, "No user found.");
+    const res = await prisma.budgets.findFirst({
+      where: { month, year, userId },
+    });
     if (!res) {
       return [];
     }
@@ -17,23 +23,23 @@ export async function getCategoriesByMonthYear(month: number, year: number) {
   }
 }
 export async function updateCategory(initialState: any, data: FormData) {
-  const id = String(data.get('id'));
-  const action = data.get('action');
+  const id = String(data.get("id"));
+  const action = data.get("action");
 
   try {
-    if (action === 'delete') {
+    if (action === "delete") {
       await prisma.categories.delete({ where: { id } });
       //return success message
-      return { message: 'Your category was deleted successfully.' };
+      return { message: "Your category was deleted successfully." };
     }
     //now do insert or update
 
-    const isRecurring = data.get('isRecurring') === 'on' ? true : false;
-    const budgetId = data.get('budgetId')?.toString() ?? '';
+    const isRecurring = data.get("isRecurring") === "on" ? true : false;
+    const budgetId = data.get("budgetId")?.toString() ?? "";
 
-    const name = data.get('name')?.toString() ?? '';
+    const name = data.get("name")?.toString() ?? "";
     const amount = parseFloat(
-      (data.get('amount')?.toString() ?? '').replace('$', '').replace(',', '')
+      (data.get("amount")?.toString() ?? "").replace("$", "").replace(",", "")
     );
     if (!id) {
       //insert a new category
@@ -41,7 +47,7 @@ export async function updateCategory(initialState: any, data: FormData) {
       const catInserted = await prisma.categories.create({
         data: { budgetId, isRecurring, amount, name },
       });
-      console.log('Cart inserted', catInserted);
+      console.log("Cart inserted", catInserted);
     } else {
       await prisma.categories.update({
         where: { id },
@@ -51,9 +57,9 @@ export async function updateCategory(initialState: any, data: FormData) {
   } catch (e) {
     //end try catch
     sentry.captureException(e);
-    return { message: 'There was an error.' };
+    return { message: "There was an error." };
     console.error(e);
   } //end try catch 2
 
-  return { message: 'Your category was updated/added successfully.' };
+  return { message: "Your category was updated/added successfully." };
 }
