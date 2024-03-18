@@ -17,10 +17,11 @@ export default function AddCategory({
   category: category;
   mode: string;
   refresh: () => void;
-  closeDialog: (prop?: any, id?: any) => void;
+  closeDialog: () => void;
 }) {
   const [categoryState, setCategory] = useState(category);
   const [modeState, setModeState] = useState(mode);
+
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setCategory((c: any) => {
@@ -35,6 +36,7 @@ export default function AddCategory({
 
   useEffect(() => {
     if (formState.message) {
+      console.log(formState.message);
       refresh();
       closeDialog();
     }

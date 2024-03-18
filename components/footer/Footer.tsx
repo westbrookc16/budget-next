@@ -1,11 +1,9 @@
-"use client";
+'use client';
 
-import styles from "@/css/footer.module.css";
-import { useUser } from "@clerk/nextjs";
+import styles from '@/css/footer.module.css';
+import { useUser } from '@clerk/nextjs';
 
-import { useEffect } from "react";
-
-import CheckoutButton from "../stripe-payment";
+import CheckoutButton from '../stripe-payment';
 
 const Footer = () => {
   const { isLoaded, isSignedIn, user } = useUser();
@@ -20,8 +18,8 @@ const Footer = () => {
         </small>
         {isLoaded && isSignedIn && (
           <div className={styles.link}>
-            {(subscriptionStatus === "none" ||
-              subscriptionStatus === "" ||
+            {(subscriptionStatus === 'none' ||
+              subscriptionStatus === '' ||
               !subscriptionStatus) &&
               isSignedIn && <CheckoutButton />}
           </div>

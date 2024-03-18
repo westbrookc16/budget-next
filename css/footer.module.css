@@ -1,10 +1,8 @@
 .footer {
-  bottom: 0;
   position: fixed;
-  border-top: 2px solid var(--color-bg-variant2);
-  background: var(--color-bg);
-  object-fit: cover;
-  padding: 3rem;
+  bottom: 0;
+  left: 0;
+  padding: 1.5rem;
   width: 100%;
   background: rgb(239 246 255);
   border-top: 1px solid gray;
@@ -22,7 +20,6 @@
 
 .footer__copywright {
   margin-bottom: 4rem;
-  color: var(--color-bg);
   display: flex;
   justify-content: center;
   align-items: center;
