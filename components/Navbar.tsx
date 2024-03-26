@@ -5,19 +5,33 @@ import Link from 'next/link';
 import logo from '@/assets/images/logo-white.png';
 import { useUser } from '@clerk/nextjs';
 import styles from '@/css/styles.module.css';
+import { Fade as Hamburger } from 'hamburger-react';
 
 import CheckoutButton from './stripe-payment';
+import { useState } from 'react';
 
 const Navbar = () => {
   const { isLoaded, isSignedIn, user } = useUser();
+  const [isNavOpen, setIsNavOpen] = useState(false);
   const subscriptionStatus = user?.publicMetadata?.stripe?.subscriptionStatus;
 
+  const toggleNav = () => {
+    setIsNavOpen(!isNavOpen);
+
+    console.log(isNavOpen);
+  };
   return (
     <div>
-      <div className={styles.navContainer}>
+      <div
+        className={isNavOpen ? styles.navContainerMobile : styles.navContainer}
+      >
         <div className={styles.navWrapper}>
-          <div className={styles.navLeft}>
-            <div className={styles.navLeftLinks}>
+          <div className={isNavOpen ? styles.navLeftMobile : styles.navLeft}>
+            <div
+              className={
+                isNavOpen ? styles.navLeftLinksMobile : styles.navLeftLinks
+              }
+            >
               <Link href='/' className={styles.navLeftLink}>
                 <Image
                   src={logo}
@@ -31,7 +45,11 @@ const Navbar = () => {
           </div>
           <div className={styles.navMiddle}></div>
           <div className={styles.navRight}>
-            <div className={styles.navRightLinks}>
+            <div
+              className={
+                isNavOpen ? styles.navRightLinksMobile : styles.navRightLinks
+              }
+            >
               <Link href='/' className={styles.homeLink}>
                 Home
               </Link>
@@ -78,6 +96,15 @@ const Navbar = () => {
                 </div>
               )}
             </div>
+          </div>
+
+          <div className={isNavOpen ? styles.burgerMobile : styles.burger}>
+            <Hamburger
+              color='#fff'
+              size={25}
+              toggle={toggleNav}
+              toggled={isNavOpen}
+            />
           </div>
         </div>
       </div>

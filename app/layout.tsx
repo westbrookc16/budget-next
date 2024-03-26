@@ -2,10 +2,10 @@ import Navbar from '@/components/Navbar';
 import { QueryProvider } from '@/components/queryprovider';
 
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Nunito } from 'next/font/google';
 import './globals.css';
 import '@progress/kendo-theme-default/dist/all.css';
-const inter = Inter({ subsets: ['latin'] });
+const nunito = Nunito({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Accessible Budget.com',
@@ -23,7 +23,7 @@ export default function RootLayout({
     <ClerkProvider>
       <QueryProvider>
         <html lang='en'>
-          <body className={inter.className}>
+          <body className={nunito.className}>
             <Navbar />
             <main>{children}</main>
             <Footer />

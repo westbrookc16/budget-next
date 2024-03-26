@@ -2,10 +2,11 @@
 .contact__container {
   padding: 30px;
   display: flex;
-  justify-content: center;
-  align-items: center;
   flex-direction: column;
+  align-items: center;
   gap: 20px;
+  height: 100vh;
+  background: rgb(250, 249, 246);
   /* background: rgb(29 78 216); */
   /* background: var(--color-bg); */
 }
@@ -94,8 +95,9 @@
   }
 }
 @media screen and (max-width: 1024px) {
-  .container.contact__container {
-    /* padding: 0; */
+  .container,
+  .contact__container {
+    padding: 20px;
   }
 }
 @media screen and (max-width: 900px) {
@@ -112,5 +114,11 @@
 @media screen and (max-width: 600px) {
   .formContainer {
     width: 90%;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .formContainer {
+    width: 100%;
   }
 }

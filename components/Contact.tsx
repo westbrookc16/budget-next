@@ -6,8 +6,8 @@ const Contact = () => {
     <section id='contact'>
       {/* <div className={styles.container}> */}
       <div className={styles.contact__container}>
-        <h2 className='font-semibold text-2xl'>Contact Us</h2>
-        <div className='italic'>
+        <h2 className='font-semibold text-xl lg:text-2xl'>Contact Us</h2>
+        <div className='italic text-sm text-center items-center md:text-lg'>
           Please feel free to leave feedback or ask questions. We will get back
           to you as soon as possible!
         </div>
