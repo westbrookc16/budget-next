@@ -20,6 +20,10 @@ module.exports = {
       },
     ];
   },
+  env: {
+    // base_url
+    NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+  },
 };
 
 // Injected content via Sentry wizard below

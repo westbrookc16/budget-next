@@ -1,6 +1,8 @@
 "use client";
 
 const HomePage = () => {
+  const url = `${process.env.NEXT_PUBLIC_BASE_URL}`;
+  console.log(`redirecting: `, url);
   return (
     <div
       style={{ background: "rgb(250, 249, 246)" }}
