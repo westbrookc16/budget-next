@@ -60,7 +60,6 @@ export default function DisplayTransactions() {
     useState<transaction>();
   const [editTransaction, setEditTransaction] = useState<transaction>();
   const getTransactions = async () => {
-    console.log(`in get transactions`);
     //get a list of transactions for the selected category
     try {
       const res = await fetch(

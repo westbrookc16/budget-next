@@ -80,7 +80,7 @@ export default function HandleBudgetPage() {
     setIncome(budget?.income ?? 0);
   }, [budget]);
   const cats: category[] = catInfo.data as category[];
-  console.log(catInfo.data, "cartifo.daraa");
+
   const total = cats?.reduce((acc, cat) => acc + cat.amount, 0) ?? 0;
 
   const loading = budgetInfo.isFetching || catInfo.isFetching;
