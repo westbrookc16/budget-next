@@ -1,4 +1,5 @@
 "use client";
+import { DateTime } from "luxon";
 import * as sentry from "@sentry/nextjs";
 import dynamic from "next/dynamic";
 import type { transaction } from "@/types/transaction";
@@ -95,7 +96,7 @@ export default function DisplayTransactions() {
           cells={{
             data: (props: GridCustomCellProps) => (
               <td {...props.tdProps}>
-                {new Date(props.dataItem["date"]).toLocaleDateString()}
+                {DateTime.fromISO(props.dataItem.date).toLocaleString()}
               </td>
             ),
           }}
