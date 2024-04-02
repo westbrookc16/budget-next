@@ -2,7 +2,7 @@
 import invariant from "tiny-invariant";
 import * as sentry from "@sentry/nextjs";
 import prisma from "@/utils/prisma";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 export async function getCategoriesByMonthYear(month: number, year: number) {
   try {
     const { userId } = auth() ?? "";

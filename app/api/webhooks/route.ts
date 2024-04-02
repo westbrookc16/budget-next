@@ -3,7 +3,7 @@ import * as sentry from "@sentry/nextjs";
 import Stripe from "stripe";
 import { stripe } from "@/utils/stripe/config";
 
-import { clerkClient } from "@clerk/nextjs";
+import { clerkClient } from "@clerk/nextjs/server";
 const toDateTime = (secs: number) => {
   var t = new Date(+0); // Unix epoch start.
   t.setSeconds(secs);

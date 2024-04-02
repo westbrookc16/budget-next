@@ -3,7 +3,7 @@ import * as Sentry from "@sentry/nextjs";
 //import { getSessionUser } from "@/utils/getSessionUser";
 import prisma from "@/utils/prisma";
 
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 //action
 export async function updateBudget(initialState: any, data: FormData) {
   const budgetId = data.get("budgetId") ?? "";

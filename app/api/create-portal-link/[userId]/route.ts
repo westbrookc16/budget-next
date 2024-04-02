@@ -2,7 +2,7 @@ import * as sentry from "@sentry/nextjs";
 import { redirect } from "next/navigation";
 import Stripe from "stripe";
 import { stripe } from "@/utils/stripe/config";
-import { clerkClient } from "@clerk/nextjs";
+import { clerkClient } from "@clerk/nextjs/server";
 
 export async function GET(req: Request, { params }: any) {
   let link: any;
