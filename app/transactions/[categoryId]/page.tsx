@@ -96,7 +96,7 @@ export default function DisplayTransactions() {
           cells={{
             data: (props: GridCustomCellProps) => (
               <td {...props.tdProps}>
-                {DateTime.fromISO(props.dataItem.date).toLocaleString()}
+                {DateTime.fromISO(props.dataItem.date).toUTC().toFormat("D")}
               </td>
             ),
           }}
