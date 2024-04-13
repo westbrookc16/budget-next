@@ -11,5 +11,6 @@ export default clerkMiddleware((auth, req) => {
   auth().protect(); // for any other route, require auth
 });
 export const config = {
+  debug: true,
   matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
 };
