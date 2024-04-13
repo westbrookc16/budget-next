@@ -10,7 +10,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@clerk/nextjs": "^5.0.0-beta.39",
+    "@clerk/nextjs": "^4.29.12",
     "@prisma/client": "^5.10.1",
     "@progress/kendo-data-query": "^1.7.0",
     "@progress/kendo-date-math": "^1.5.12",
