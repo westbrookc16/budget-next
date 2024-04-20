@@ -14,7 +14,8 @@ import { NumericTextBox } from "@progress/kendo-react-inputs";
 import { DropDownList } from "@progress/kendo-react-dropdowns";
 import { DateInput } from "@progress/kendo-react-dateinputs";
 import { Input } from "@progress/kendo-react-inputs";
-import type { transaction } from "@/types/transaction";
+import { Tables } from "@/types/supabase";
+import invariant from "tiny-invariant";
 
 export default function AddTransaction({
   categoryId,
@@ -23,11 +24,11 @@ export default function AddTransaction({
   closeDialog,
   refreshGrid,
 }: {
-  categoryId: string;
+  categoryId: number;
   mode: string;
   closeDialog: () => void;
   refreshGrid: () => void;
-  transaction: transaction;
+  transaction: Tables<"transaction">;
 }) {
   const getCategories = async (id: string) => {
     //get the current category id so we can get the categoreis from that budget
@@ -42,19 +43,20 @@ export default function AddTransaction({
     return res2.json();
   };
   const catInfo = useQuery({
-    queryKey: ["categories", categoryId],
-    queryFn: () => getCategories(categoryId as string),
+    queryKey: ["categories", categoryId.toString()],
+    queryFn: () => getCategories(categoryId.toString()),
   });
-  const cats: category[] = catInfo.data as category[];
+  const cats: Tables<"category">[] = catInfo.data as Tables<"category">[];
   const initialState: formState = { message: "", timestamp: new Date() };
   const [realCategory, setRealCategory] = useState<String>("");
 
   const [selectedCat, setSelectedCat] = useState(() =>
-    categoryId !== ""
-      ? cats.filter((v: category) => v.id === categoryId)[0]
+    categoryId !== 0
+      ? cats.filter((v: Tables<"category">) => v.id === +categoryId)[0]
       : cats[0]
   );
-
+  //invariant(transaction.name !== null, "name is required");
+  //invariant(transaction.description !== null, "description is required");
   return (
     <div>
       <h1>Add Transaction</h1>
@@ -73,25 +75,25 @@ export default function AddTransaction({
           type="text"
           name="name"
           autoFocus
-          defaultValue={transaction.name}
+          defaultValue={transaction.name ?? ""}
           label="Name"
         />
         <Input
           type="text"
           name="description"
           label="Description"
-          defaultValue={transaction.description}
+          defaultValue={transaction.description ?? ""}
         />
         <DateInput
           label="Date"
           name="date"
-          defaultValue={new Date(transaction.date)}
+          defaultValue={new Date(transaction.date ?? "")}
         />
         <NumericTextBox
           label="Amount"
           name="amount"
           format="c2"
-          defaultValue={transaction.amount}
+          defaultValue={transaction.amount ?? 0}
         />
         <DropDownList
           defaultItem={selectedCat}

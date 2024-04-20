@@ -1,12 +1,15 @@
-import prisma from "@/utils/prisma";
+import { createClient } from "@/utils/supabase/server";
 export async function GET(request: Request, { params }: any) {
   const { id } = params;
 
-  const category = await prisma.categories.findUnique({
-    where: {
-      id: id,
-    },
-  });
+  const { data: category, error } = await createClient()
+    .from("category")
+    .select("*")
+    .match({ id });
+  if (error) {
+    console.log(JSON.stringify(error));
+    return new Response(JSON.stringify({ error: error.message }));
+  }
 
-  return new Response(JSON.stringify(category));
+  return new Response(JSON.stringify(category[0]));
 }

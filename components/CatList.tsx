@@ -1,10 +1,10 @@
 "use client";
-import { useUser } from "@clerk/nextjs";
-
+import { getSubscriptionStatus } from "@/app/actions/user";
+import { Tables } from "@/types/supabase";
 import { formatCurrency } from "@/utils/money";
 import type { category } from "@/types/category";
 import { Dialog, DialogActionsBar } from "@progress/kendo-react-dialogs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddCategory from "./AddCategory";
 import {
   Grid,
@@ -17,9 +17,18 @@ import { updateCategory } from "@/app/actions/categories";
 import Link from "next/link";
 
 export default function CatList({ budgetID, cats, refreshGrid }: any) {
-  const { user } = useUser();
-  const subscriptionStatus: string | undefined =
-    user?.publicMetadata?.stripe?.subscriptionStatus;
+  //const { user } = useUser();
+  const [subscriptionStatus, setSubscriptionStatus] = useState<
+    string | Response
+  >("none");
+
+  useEffect(() => {
+    async function getData() {
+      const status = await getSubscriptionStatus();
+      setSubscriptionStatus(status ?? "none");
+    }
+    getData();
+  });
   const originalState = { message: "" };
   const [deleteFormState, deleteAction] = useFormState(
     updateCategory,
@@ -49,13 +58,13 @@ export default function CatList({ budgetID, cats, refreshGrid }: any) {
       </td>
     );
   };
-  const [editCat, setEditCat] = useState<category>({
-    id: "",
+  const [editCat, setEditCat] = useState<Tables<"category">>({
+    id: 0,
     name: "",
     amount: 0,
-    isRecurring: false,
-    budgetId: "",
-    totalSpent: 0,
+    is_recurring: false,
+    budget_id: 0,
+    user_id: "",
   });
   const [deleteCat, setDeleteCat] = useState<category>({
     id: "",
@@ -120,19 +129,19 @@ export default function CatList({ budgetID, cats, refreshGrid }: any) {
           className="text-lg"
         />
         <Column
-          field="isRecurring"
+          field="is_recurring"
           title="Is Recurring"
           cells={{ data: checkboxCell }}
         />
         {isActive && (
           <Column
-            field="totalSpent"
+            field="total_spent"
             title="Total Spent"
             format="{0:c2}"
             cells={{
               data: (e: GridCustomCellProps) => (
                 <td {...e.tdProps} colSpan={1}>
-                  {formatCurrency(e.dataItem["totalSpent"] ?? 0)}
+                  {formatCurrency(e.dataItem["total_spent"] ?? 0)}
                 </td>
               ),
             }}
@@ -212,10 +221,10 @@ export default function CatList({ budgetID, cats, refreshGrid }: any) {
             category={{
               name: "",
               amount: 0,
-              isRecurring: false,
-              id: "",
-              budgetId: budgetID,
-              totalSpent: 0,
+              is_recurring: false,
+              id: 0,
+              budget_id: budgetID,
+              user_id: "",
             }}
             mode="Add"
             refresh={refreshGrid}

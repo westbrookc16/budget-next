@@ -1,9 +1,9 @@
-import prisma from "@/utils/prisma";
+//import prisma from "@/utils/prisma";
 import * as sentry from "@sentry/nextjs";
 import Stripe from "stripe";
 import { stripe } from "@/utils/stripe/config";
+import { createServiceRoleClient } from "@/utils/supabase/server";
 
-import { clerkClient } from "@clerk/nextjs/server";
 const toDateTime = (secs: number) => {
   var t = new Date(+0); // Unix epoch start.
   t.setSeconds(secs);
@@ -17,27 +17,6 @@ const manageSubscriptionStatusChange = async (
 ) => {
   const subscription = await stripe.subscriptions.retrieve(subscriptionID);
 
-  //
-  const dbSub = await prisma?.subscriptions.findUnique({
-    where: { subscription_id: subscriptionID },
-  });
-  //get the user
-  let user: any = {};
-  if (userId)
-    try {
-      user = await clerkClient.users.getUser(userId);
-    } catch (e) {
-      console.error(e);
-      return new Response(`User not found for subscription ${subscriptionID}`, {
-        status: 200,
-      });
-    }
-  if (!user) {
-    console.error(`❌ User not found for subscription ${subscriptionID}`);
-    return new Response(`User not found for subscription ${subscriptionID}`, {
-      status: 200,
-    });
-  }
   if (isSubscriptionCreated) {
     //update metadata for subscription in stripe
 
@@ -47,140 +26,23 @@ const manageSubscriptionStatusChange = async (
       },
     });
   }
-  if (!dbSub) {
-    //if it is cancelled, we do not want to insert a new record
-    if (subscription.status === "canceled") {
-      return;
-    }
 
-    // Create a new subscription record in the database
-    if (isSubscriptionCreated) {
-      await prisma?.subscriptions.create({
-        data: {
-          subscription_id: subscriptionID,
-          user_id: subscription.metadata.userId as string,
-          customer: customerID,
-          status: subscription.status,
-          metadata: JSON.stringify(subscription.metadata),
-          price_id: subscription.items.data[0].price.id,
-          cancel_at_period_end: subscription.cancel_at_period_end,
-          cancel_at: subscription.cancel_at
-            ? toDateTime(subscription.cancel_at as number).toISOString()
-            : null,
-          current_period_end: subscription.current_period_end
-            ? toDateTime(
-                subscription.current_period_end as number
-              ).toISOString()
-            : null,
-          canceled_at: subscription.canceled_at
-            ? toDateTime(subscription.canceled_at as number).toISOString()
-            : null,
-          current_period_start: subscription.current_period_start
-            ? toDateTime(
-                subscription.current_period_start as number
-              ).toISOString()
-            : null,
-          created: toDateTime(subscription.created).toISOString(),
-          ended_at: subscription.ended_at
-            ? toDateTime(subscription.ended_at as number).toISOString()
-            : null,
-          trial_end: subscription.trial_end
-            ? toDateTime(subscription.trial_end as number).toISOString()
-            : null,
-          trial_start: subscription.trial_start
-            ? toDateTime(subscription.trial_start as number).toISOString()
-            : null,
-        },
-      });
-      if (userId !== "")
-        clerkClient.users.updateUserMetadata(userId as string, {
-          publicMetadata: {
-            ...user.publicMetadata,
-            stripe: {
-              subscriptionStatus: subscription.status,
-            },
-          },
-          privateMetadata: {
-            ...user.privateMetadata,
-            stripe: {
-              customer: customerID,
-            },
-          },
-        });
-    }
-  } else {
-    //if the status is cancelled, delete the subscription
-    if (subscription.status === "canceled") {
-      await prisma?.subscriptions.delete({
-        where: { subscription_id: subscriptionID },
-      });
-      //update clerk user metadata
-      clerkClient.users.updateUserMetadata(
-        subscription.metadata.userId as string,
-        {
-          publicMetadata: {
-            ...user.publicMetadata,
-            stripe: {
-              subscriptionStatus: "none",
-            },
-          },
-
-          privateMetadata: {
-            ...user.privateMetadata,
-            stripe: {
-              customer: null,
-            },
-          },
-        }
+  if (userId && userId !== "") {
+    console.log(`updating supabase ${subscription.status}`);
+    const supabase = createServiceRoleClient();
+    const { data, error } = await supabase
+      .from("user_data")
+      .update({
+        subscription_status: subscription.status,
+        customer: subscription.customer.toString(),
+      })
+      .match({ user_id: userId });
+    if (error) {
+      console.error(
+        `error updating supabase ${JSON.stringify(error, null, 2)}`
       );
-      return;
+      sentry.captureException(error);
     }
-    //update clerk user metadata
-    if (userId !== "")
-      clerkClient.users.updateUserMetadata(userId, {
-        publicMetadata: {
-          ...user.publicMetadata,
-          stripe: {
-            subscriptionStatus: subscription.status,
-            customer: customerID,
-          },
-        },
-      });
-    // Update the existing subscription record in the database
-
-    await prisma?.subscriptions.update({
-      where: { subscription_id: subscriptionID },
-      data: {
-        status: subscription.status,
-        metadata: JSON.stringify(subscription.metadata),
-        user_id: subscription.metadata.userId as string,
-        price_id: subscription.items.data[0].price.id,
-        cancel_at_period_end: subscription.cancel_at_period_end,
-        cancel_at: subscription.cancel_at
-          ? toDateTime(subscription.cancel_at as number).toISOString()
-          : null,
-        current_period_end: subscription.current_period_end
-          ? toDateTime(subscription.current_period_end as number).toISOString()
-          : null,
-        canceled_at: subscription.canceled_at
-          ? toDateTime(subscription.canceled_at as number).toISOString()
-          : null,
-        current_period_start: subscription.current_period_start
-          ? toDateTime(
-              subscription.current_period_start as number
-            ).toISOString()
-          : null,
-        ended_at: subscription.ended_at
-          ? toDateTime(subscription.ended_at as number).toISOString()
-          : null,
-        trial_end: subscription.trial_end
-          ? toDateTime(subscription.trial_end as number).toISOString()
-          : null,
-        trial_start: subscription.trial_start
-          ? toDateTime(subscription.trial_start as number).toISOString()
-          : null,
-      },
-    });
   }
 };
 const relevantEvents = new Set([

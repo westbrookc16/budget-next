@@ -1,18 +1,18 @@
 "use server";
 import * as Sentry from "@sentry/nextjs";
 //import { getSessionUser } from "@/utils/getSessionUser";
-import prisma from "@/utils/prisma";
+import { createClient } from "@/utils/supabase/server";
 
-import { auth } from "@clerk/nextjs/server";
 //action
 export async function updateBudget(initialState: any, data: FormData) {
+  const supabase = createClient();
   const budgetId = data.get("budgetId") ?? "";
   const monthValue = data.get("realMonth") ?? "";
   const month = monthValue ? parseInt(monthValue.toString()) : 0;
 
   const yearValue = parseInt(data.get("year")?.toString() ?? "0");
   const year = yearValue ? parseInt(yearValue.toString()) : 0;
-  const { userId } = auth() ?? "";
+  const userId = await (await supabase.auth.getUser()).data.user?.id;
   console.log(`submit: ${data.get("submit")}`);
   if (data.get("submit") === "Submit") {
     console.log(`in right if`);
@@ -27,14 +27,23 @@ export async function updateBudget(initialState: any, data: FormData) {
 
       if (!budgetId) {
         //do an insert
-        const resBudget = await prisma.budgets.create({
-          data: { month, year, income, userId },
-        });
+        console.log("Inserting");
+        const { data: resBudget, error } = await supabase
+          .from("budget")
+          .insert({ year, month, income, user_id: userId });
+        console.log(JSON.stringify(error, null, 2));
+        if (error) {
+          Sentry.captureException(error);
+          return {
+            message: "An error occurred. Please try again.",
+            timestamp: new Date(),
+          };
+        }
       } else {
-        await prisma.budgets.update({
-          data: { income },
-          where: { id: budgetId.toString() },
-        });
+        const { error } = await supabase
+          .from("budget")
+          .update({ income })
+          .match({ id: budgetId });
       }
       return {
         message: "Your budget was updated successfully.",
@@ -61,31 +70,6 @@ export async function updateBudget(initialState: any, data: FormData) {
       if (!previousMonth || !previousYear || !userId) {
         return { message: "No action taken.", timestamp: new Date() };
       }
-      const previousBudget = await prisma.budgets.findFirst({
-        where: { userId, month: previousMonth, year: previousYear },
-      });
-      const previousBudgetId = previousBudget?.id;
-      const previousCategories = await prisma.categories.findMany({
-        where: { budgetId: previousBudgetId, isRecurring: true },
-      });
-      const currentBudget = await prisma.budgets.findFirst({
-        where: { userId, month, year },
-      });
-      const currentBudgetId = currentBudget?.id;
-      if (!currentBudgetId) {
-        return { message: "No action taken.", timestamp: new Date() };
-      }
-      for (const category of previousCategories) {
-        const { name, amount, isRecurring } = category;
-        await prisma.categories.create({
-          data: {
-            name,
-            amount,
-            isRecurring,
-            budgetId: currentBudgetId,
-          },
-        });
-      } //end for
     } catch (error) {
       Sentry.captureException(error);
       return {

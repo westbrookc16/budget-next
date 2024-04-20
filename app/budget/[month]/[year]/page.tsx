@@ -30,7 +30,9 @@ import { NumericTextBox } from "@progress/kendo-react-inputs";
 import Loader from "@/common/Loader";
 import { budget } from "@/types/budget";
 import { category } from "@/types/category";
-import { useUser } from "@clerk/nextjs";
+import { createClient } from "@/utils/supabase/client";
+import { Database, Tables } from "@/types/supabase";
+import { getSubscriptionStatus } from "@/app/actions/user";
 
 /*export function generateMetadata({ params }): Metadata {
   //
@@ -39,9 +41,27 @@ import { useUser } from "@clerk/nextjs";
 }*/
 export default function HandleBudgetPage() {
   //use global state context
-  const { user } = useUser();
-  const subscriptionStatus: string | undefined =
-    user?.publicMetadata?.stripe?.subscriptionStatus;
+  const [user, setUser] = useState({});
+  const supabase = createClient();
+  useEffect(() => {
+    async function fetchUser() {
+      const { data } = await supabase.auth.getUser();
+      if (data.user) {
+        setUser(data.user);
+      }
+    }
+    fetchUser();
+  }, [supabase.auth]);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<
+    string | Response
+  >("");
+  useEffect(() => {
+    async function fetchSubscriptionStatus() {
+      const subStatus = await getSubscriptionStatus();
+      setSubscriptionStatus(subStatus ?? "none");
+    }
+    fetchSubscriptionStatus();
+  }, []);
   const isActive =
     subscriptionStatus === "active" || subscriptionStatus === "trialing";
   const [income, setIncome] = useState<number>(0);
@@ -79,9 +99,10 @@ export default function HandleBudgetPage() {
   useEffect(() => {
     setIncome(budget?.income ?? 0);
   }, [budget]);
-  const cats: category[] = catInfo.data as category[];
+  const cats: Tables<"category_with_total_spent">[] =
+    catInfo.data as Tables<"category_with_total_spent">[];
 
-  const total = cats?.reduce((acc, cat) => acc + cat.amount, 0) ?? 0;
+  const total = cats?.reduce((acc, cat) => acc + (cat.amount ?? 0), 0) ?? 0;
 
   const loading = budgetInfo.isFetching || catInfo.isFetching;
   //const loading = false;
@@ -252,7 +273,7 @@ export default function HandleBudgetPage() {
             }}
             label="Income"
           />
-          <input type="hidden" name="budgetId" value={budget?.id} />
+          <input type="hidden" name="budgetId" value={budget?.id || ""} />
           <SubmitButton />
           &nbsp;{budget?.id && isActive && <CopyMonthsButton />}
         </form>

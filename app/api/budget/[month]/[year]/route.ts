@@ -1,22 +1,16 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
-import prisma from "@/utils/prisma";
+import { createClient } from "@/utils/supabase/server";
+
 export async function GET(request: Request, { params }: any) {
   const { month, year } = params;
-  //get user from clerk
-  const { userId } = auth();
 
-  if (!userId) {
-    return new Response(`{ msg: "no user" }`, { status: 500 });
-  }
-  const budget = await prisma.budgets.findFirst({
-    where: {
-      month: parseInt(month),
-      year: parseInt(year),
-      userId: userId,
-    },
-  });
+  const { data: budget } = await createClient()
+    .from("budget")
+    .select("*")
+    .match({ month: parseInt(month), year: parseInt(year) });
 
   return new Response(
-    JSON.stringify(!budget ? { year, month, income: 0.0, id: "" } : budget)
+    JSON.stringify(
+      !budget[0] ? { year, month, income: 0.0, id: "" } : budget[0]
+    )
   );
 }

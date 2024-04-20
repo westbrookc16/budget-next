@@ -1,6 +1,6 @@
 "use server";
 import * as sentry from "@sentry/nextjs";
-import prisma from "@/utils/prisma";
+import { createClient } from "@/utils/supabase/server";
 import type { formState } from "@/types/formstate";
 export async function createTransaction(
   initialState: formState,
@@ -14,24 +14,20 @@ export async function createTransaction(
   const category = String(data.get("realCategory"));
   const description = String(data.get("description"));
   try {
-    await prisma.transactions.create({
-      data: {
-        name,
-        amount,
-        date,
-        categoryId: category,
-        description,
-      },
+    const supabase = createClient();
+    const userId = await (await supabase.auth.getUser()).data.user?.id;
+    const { error } = await supabase.from("transaction").insert({
+      amount,
+      date: date.toISOString(),
+      category_id: +category,
+      description,
+      user_id: userId,
+      name,
     });
-    //get hte category the transaction belongs to
-    const cat = await prisma.categories.findUnique({
-      where: { id: category },
-    });
-    //update the category total spent
-    await prisma.categories.update({
-      where: { id: category },
-      data: { totalSpent: (cat?.totalSpent ?? 0) + amount },
-    });
+    if (error) {
+      sentry.captureException(error);
+      console.error(error);
+    }
   } catch (e) {
     console.error(e);
     sentry.captureException(e);
@@ -46,40 +42,27 @@ export async function updateTransaction(
   const amount = Number(
     data.get("amount")?.toString().replace("$", "").replace(",", "") || 0
   );
-  const date = new Date(String(data.get("date")));
+  const date = String(data.get("date"));
   const category = String(data.get("realCategory"));
   const description = String(data.get("description"));
   const id = String(data.get("id"));
   try {
-    //get the category for the transaction to get the old total spent
-    const cat = await prisma.categories.findUnique({ where: { id: category } });
-
-    const currentTransaction = await prisma.transactions.findUnique({
-      where: { id },
-    });
-
-    await prisma.transactions.update({
-      where: { id },
-      data: {
-        name,
+    const supabase = createClient();
+    const userId = await (await supabase.auth.getUser()).data.user?.id;
+    const { error } = await supabase
+      .from("transaction")
+      .update({
         amount,
         date,
-        categoryId: category,
+        category_id: +category,
         description,
-      },
-    });
-
-    //update the category total spent
-
-    const newTotalSpent =
-      (cat?.totalSpent ?? 0) + amount - (currentTransaction?.amount ?? 0);
-
-    const updatedCat = await prisma.categories.update({
-      where: { id: category },
-      data: {
-        totalSpent: newTotalSpent,
-      },
-    });
+        name,
+      })
+      .match({ id });
+    if (error) {
+      sentry.captureException(error);
+      console.error(error);
+    }
   } catch (e) {
     console.error(e);
     sentry.captureException(e);
@@ -92,17 +75,13 @@ export async function deleteTransaction(
 ) {
   const id = String(data.get("id"));
   try {
-    await prisma.transactions.delete({ where: { id } });
-    const amount = parseFloat(
-      (data.get("amount") as string).replace("$", "").replace(",", "")
-    );
-    const category = String(data.get("realCategory"));
-
-    const cat = await prisma.categories.findUnique({ where: { id: category } });
-    await prisma.categories.update({
-      where: { id: category },
-      data: { totalSpent: (cat?.totalSpent ?? 0) - amount },
-    });
+    const supabase = createClient();
+    const userId = await (await supabase.auth.getUser()).data.user?.id;
+    const { error } = await supabase.from("transaction").delete().match({ id });
+    if (error) {
+      sentry.captureException(error);
+      console.error(error);
+    }
   } catch (e) {
     console.error(e);
 

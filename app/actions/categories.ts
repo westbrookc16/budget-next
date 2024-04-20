@@ -1,58 +1,73 @@
 "use server";
+import { createClient } from "@/utils/supabase/server";
 import invariant from "tiny-invariant";
 import * as sentry from "@sentry/nextjs";
 import prisma from "@/utils/prisma";
-import { auth } from "@clerk/nextjs/server";
+
 export async function getCategoriesByMonthYear(month: number, year: number) {
   try {
-    const { userId } = auth() ?? "";
-    invariant(userId, "No user found.");
-    const res = await prisma.budgets.findFirst({
-      where: { month, year, userId },
-    });
+    const supabase = createClient();
+
+    const res =
+      //@ts-ignore
+      (await supabase.from("budget").select("id").match({ month, year }))
+        ?.data[0]?.id ?? -1;
+    console.log(`res=${res}`);
     if (!res) {
       return [];
     }
-    const res2 = await prisma.categories.findMany({
-      where: { budgetId: res.id },
-    });
-    return res2;
+    const res2 = await supabase
+      .from("category_with_total_spent")
+      .select("*")
+      .match({ budget_id: res });
+    console.log(res2.error);
+    return res2.data;
   } catch (e) {
     sentry.captureException(e);
     return [];
   }
 }
 export async function updateCategory(initialState: any, data: FormData) {
+  const supabase = createClient();
   const id = String(data.get("id"));
   const action = data.get("action");
 
   try {
     if (action === "delete") {
-      await prisma.categories.delete({ where: { id } });
+      await supabase.from("category").delete().match({ id });
       //return success message
       return { message: "Your category was deleted successfully." };
     }
     //now do insert or update
 
-    const isRecurring = data.get("isRecurring") === "on" ? true : false;
+    const isRecurring = data.get("is_recurring") === "on" ? true : false;
     const budgetId = data.get("budgetId")?.toString() ?? "";
 
     const name = data.get("name")?.toString() ?? "";
     const amount = parseFloat(
       (data.get("amount")?.toString() ?? "").replace("$", "").replace(",", "")
     );
-    if (!id) {
+    if (parseInt(id) === 0) {
       //insert a new category
 
-      const catInserted = await prisma.categories.create({
-        data: { budgetId, isRecurring, amount, name },
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      const { data, error } = await supabase.from("category").insert({
+        name,
+        amount,
+        is_recurring: isRecurring,
+        budget_id: +budgetId,
+        user_id: userId,
       });
-      console.log("Cart inserted", catInserted);
+      if (error) {
+        sentry.captureException(error);
+        console.log(JSON.stringify(error));
+        return { message: "There was an error." };
+      }
     } else {
-      await prisma.categories.update({
-        where: { id },
-        data: { name, amount, isRecurring },
-      });
+      await supabase
+        .from("category")
+        .update({ name, amount, is_recurring: isRecurring })
+        .match({ id });
     } //end else
   } catch (e) {
     //end try catch

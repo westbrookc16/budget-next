@@ -1,20 +1,44 @@
-'use client';
-import { SignInButton, SignOutButton } from '@clerk/nextjs';
-import Image from 'next/image';
-import Link from 'next/link';
-import logo from '@/assets/images/logo-white.png';
-import { useUser } from '@clerk/nextjs';
-import styles from '@/css/styles.module.css';
-import { Fade as Hamburger } from 'hamburger-react';
+"use client";
+import SignOutButton from "./signOutButton";
+import SignInButton from "./SignInButton";
+import Image from "next/image";
+import Link from "next/link";
+import logo from "@/assets/images/logo-white.png";
 
-import CheckoutButton from './stripe-payment';
-import { useState } from 'react';
+import styles from "@/css/styles.module.css";
+import { Fade as Hamburger } from "hamburger-react";
 
+import CheckoutButton from "./stripe-payment";
+import { useState, useEffect } from "react";
+import { createClient } from "@/utils/supabase/client";
 const Navbar = () => {
-  const { isLoaded, isSignedIn, user } = useUser();
+  const [user, setUser] = useState();
   const [isNavOpen, setIsNavOpen] = useState(false);
-  const subscriptionStatus = user?.publicMetadata?.stripe?.subscriptionStatus;
-
+  const [subscriptionStatus, setSubscriptionStatus] = useState("");
+  useEffect(() => {
+    async function fetchUser() {
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.getUser();
+      if (error) {
+        console.error(JSON.stringify(error));
+        return;
+      }
+      if (data.user) {
+        setUser(data.user);
+      }
+      const { data: subscriptionStatus, error: subscriptionError } =
+        await supabase.from("user_data").select("subscription_status").single();
+      if (subscriptionStatus) {
+        setSubscriptionStatus(
+          subscriptionStatus?.subscription_status ?? "none"
+        );
+      }
+      if (subscriptionError) {
+        console.error(JSON.stringify(subscriptionError));
+      }
+    }
+    fetchUser();
+  }, []);
   const toggleNav = () => {
     setIsNavOpen(!isNavOpen);
 
@@ -32,10 +56,10 @@ const Navbar = () => {
                 isNavOpen ? styles.navLeftLinksMobile : styles.navLeftLinks
               }
             >
-              <Link href='/' className={styles.navLeftLink}>
+              <Link href="/" className={styles.navLeftLink}>
                 <Image
                   src={logo}
-                  alt='Budget Management Home Logo'
+                  alt="Budget Management Home Logo"
                   width={45}
                   height={45}
                   className={styles.logo}
@@ -50,10 +74,10 @@ const Navbar = () => {
                 isNavOpen ? styles.navRightLinksMobile : styles.navRightLinks
               }
             >
-              <Link href='/' className={styles.homeLink}>
+              <Link href="/" className={styles.homeLink}>
                 Home
               </Link>
-              {isLoaded && isSignedIn ? (
+              {user ? (
                 <>
                   <Link
                     href={`/budget/${
@@ -63,13 +87,13 @@ const Navbar = () => {
                   >
                     Budget Management
                   </Link>
-                  {(subscriptionStatus === 'active' ||
-                    subscriptionStatus === 'trialing') &&
-                    isSignedIn && (
+                  {(subscriptionStatus === "active" ||
+                    subscriptionStatus === "trialing") &&
+                    user && (
                       <>
                         <div className={styles.link}>
                           <Link
-                            href={`${process.env.NEXT_PUBLIC_BASE_URL}api/create-portal-link/${user.id}`}
+                            href={`${process.env.NEXT_PUBLIC_BASE_URL}api/create-portal-link/${user?.id}`}
                             className={styles.link}
                           >
                             Manage Subscription
@@ -78,13 +102,14 @@ const Navbar = () => {
                       </>
                     )}
                   <div className={styles.linkSub}>
-                    {(subscriptionStatus === 'none' ||
-                      subscriptionStatus === '' ||
+                    {(subscriptionStatus === "none" ||
+                      subscriptionStatus === "" ||
+                      subscriptionStatus === "canceled" ||
                       !subscriptionStatus) &&
-                      isSignedIn && <CheckoutButton />}
+                      user && <CheckoutButton />}
                   </div>
                   <div className={styles.link}>
-                    <Link href='/contact'>Contact</Link>
+                    <Link href="/contact">Contact</Link>
                   </div>
                   <div className={styles.link}>
                     <SignOutButton />
@@ -100,7 +125,7 @@ const Navbar = () => {
 
           <div className={isNavOpen ? styles.burgerMobile : styles.burger}>
             <Hamburger
-              color='#fff'
+              color="#fff"
               size={25}
               toggle={toggleNav}
               toggled={isNavOpen}

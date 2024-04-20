@@ -1,15 +1,18 @@
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import * as sentry from "@sentry/nextjs";
+import invariant from "tiny-invariant";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: "2023-10-16",
 });
 
 export async function POST(req: NextRequest) {
-  const { userId } = auth();
+  const supabase = createClient();
+  const { data } = await supabase.auth.getUser();
+  const userId = data.user?.id;
   const { unit_amount, quantity } = await req.json();
-
+  invariant(userId, "User ID is missing");
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],

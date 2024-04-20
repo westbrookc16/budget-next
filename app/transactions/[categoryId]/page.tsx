@@ -1,4 +1,5 @@
 "use client";
+import { Tables } from "@/types/supabase";
 import { DateTime } from "luxon";
 import * as sentry from "@sentry/nextjs";
 import dynamic from "next/dynamic";
@@ -12,7 +13,7 @@ import {
 import { deleteTransaction } from "@/app/actions/transactions";
 import React, { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
+
 import { category } from "@/types/category";
 import { useQuery } from "@tanstack/react-query";
 
@@ -20,14 +21,15 @@ export default function DisplayTransactions() {
   const { categoryId } = useParams();
   const getCategories = async (id: string) => {
     //get the current category id so we can get the categoreis from that budget
+    console.log(`get categories id:${id}`);
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}api/categories/getById/${id}`
     );
-    const category = (await res.json()) as category;
+    const category = (await res.json()) as Tables<"category">;
     //get the categories for the current budget
 
     const res2 = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}api/categories/${category.budgetId}`
+      `${process.env.NEXT_PUBLIC_BASE_URL}api/categories/${category.budget_id}`
     );
     return res2.json();
   };
@@ -35,7 +37,7 @@ export default function DisplayTransactions() {
     queryKey: ["categories", categoryId],
     queryFn: () => getCategories(categoryId as string),
   });
-  const cats: category[] = catInfo.data as category[];
+  const cats: Tables<"category">[] = catInfo.data as Tables<"category">[];
   const [lastElement, setLastElement] = useState<Element>();
   const Grid: any = dynamic(
     () =>
@@ -48,7 +50,9 @@ export default function DisplayTransactions() {
   //
   const selectedCat = useCallback(
     () =>
-      categoryId !== "" ? cats?.filter((v) => v.id === categoryId)[0] : cats[0],
+      categoryId !== ""
+        ? cats?.filter((v) => v.id === +categoryId)[0]
+        : cats[0],
     [categoryId, cats]
   );
 
@@ -59,7 +63,8 @@ export default function DisplayTransactions() {
     useState<Boolean>(false);
   const [transactionToBeDeleted, setTransactionToBeDeleted] =
     useState<transaction>();
-  const [editTransaction, setEditTransaction] = useState<transaction>();
+  const [editTransaction, setEditTransaction] =
+    useState<Tables<"transaction">>();
   const getTransactions = async () => {
     //get a list of transactions for the selected category
     try {
@@ -146,11 +151,12 @@ export default function DisplayTransactions() {
           <AddTransaction
             transaction={{
               name: "",
+              user_id: "",
               description: "",
               amount: 0,
-              date: new Date(),
-              category: selectedCat().id,
-              id: "",
+              date: new Date().toISOString(),
+              category_id: +selectedCat().id,
+              id: 0,
             }}
             categoryId={selectedCat()?.id}
             mode="Add"
