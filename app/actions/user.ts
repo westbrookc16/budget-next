@@ -32,7 +32,7 @@ export async function login(originalState: any, data: FormData) {
 
   if (error) {
     console.log(JSON.stringify(error));
-    return error;
+    return { message: error.message };
   }
   return redirect("/");
 }
@@ -49,11 +49,12 @@ export async function signup(originalState: any, data: FormData) {
       provider: "google",
     });
     console.log(`authData=${JSON.stringify(data, null, 2)}`);
+    return redirect(data.url);
     if (error) {
       console.log(JSON.stringify(error));
       return { message: error.message };
     }
-    return redirect("/");
+    return { message: "Signed in with Google" };
   } else {
     const origin = headers().get("origin");
     if (password !== confirmPassword) {

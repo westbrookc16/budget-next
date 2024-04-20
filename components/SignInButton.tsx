@@ -1,7 +1,7 @@
 import { createClient } from "@/utils/supabase/client";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
-export default function SignInButton() {
+export default function SignInButton({ text }: { text: string }) {
   const supabase = createClient();
   return (
     <button
@@ -13,10 +13,11 @@ export default function SignInButton() {
           provider: "google",
         });
         if (error) console.log("Error logging in:", error.message);
-        redirect("/");
+        //redirect("/");
       }}
     >
-      Sign In
+      {text ?? "Sign In"}
     </button>
   );
 }
+//whats is the difference making use of this button and  and the function in the user.ts?

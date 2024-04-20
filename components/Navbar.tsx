@@ -39,6 +39,18 @@ const Navbar = () => {
     }
     fetchUser();
   }, []);
+
+  useEffect(() => {
+    const supabase = createClient();
+    const sub = supabase.auth.onAuthStateChange((event, session) => {
+      console.log(event);
+      console.log(session);
+      setUser(session?.user?.id ?? null);
+    });
+    return () => {
+      sub.data.subscription.unsubscribe();
+    };
+  }, []);
   const toggleNav = () => {
     setIsNavOpen(!isNavOpen);
 
@@ -116,9 +128,7 @@ const Navbar = () => {
                   </div>
                 </>
               ) : (
-                <div className={styles.link}>
-                  <SignInButton />
-                </div>
+                <div className={styles.link}></div>
               )}
             </div>
           </div>
