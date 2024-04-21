@@ -1,5 +1,6 @@
 "use server";
 import { createClient } from "@/utils/supabase/server";
+import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
 import { redirect } from "next/navigation";
@@ -34,6 +35,7 @@ export async function login(originalState: any, data: FormData) {
     console.log(JSON.stringify(error));
     return { message: error.message };
   }
+  revalidatePath("/", "layout");
   return redirect("/");
 }
 
@@ -48,8 +50,8 @@ export async function signup(originalState: any, data: FormData) {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
     });
-    console.log(`authData=${JSON.stringify(data, null, 2)}`);
-    return redirect(data.url);
+    //console.log(`authData=${JSON.stringify(data, null, 2)}`);
+    //return redirect(data.url);
     if (error) {
       console.log(JSON.stringify(error));
       return { message: error.message };
