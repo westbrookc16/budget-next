@@ -1,20 +1,20 @@
-"use client";
-import SignOutButton from "./signOutButton";
-import SignInButton from "./SignInButton";
-import Image from "next/image";
-import Link from "next/link";
-import logo from "@/assets/images/logo-white.png";
+'use client';
+import SignOutButton from './signOutButton';
+import SignInButton from './SignInButton';
+import Image from 'next/image';
+import Link from 'next/link';
+import logo from '@/assets/images/logo-white.png';
 
-import styles from "@/css/styles.module.css";
-import { Fade as Hamburger } from "hamburger-react";
+import styles from '@/css/styles.module.css';
+import { Fade as Hamburger } from 'hamburger-react';
 
-import CheckoutButton from "./stripe-payment";
-import { useState, useEffect } from "react";
-import { createClient } from "@/utils/supabase/client";
+import CheckoutButton from './stripe-payment';
+import { useState, useEffect } from 'react';
+import { createClient } from '@/utils/supabase/client';
 const Navbar = () => {
   const [user, setUser] = useState();
   const [isNavOpen, setIsNavOpen] = useState(false);
-  const [subscriptionStatus, setSubscriptionStatus] = useState("");
+  const [subscriptionStatus, setSubscriptionStatus] = useState('');
   useEffect(() => {
     async function fetchUser() {
       const supabase = createClient();
@@ -27,10 +27,10 @@ const Navbar = () => {
         setUser(data.user);
       }
       const { data: subscriptionStatus, error: subscriptionError } =
-        await supabase.from("user_data").select("subscription_status").single();
+        await supabase.from('user_data').select('subscription_status').single();
       if (subscriptionStatus) {
         setSubscriptionStatus(
-          subscriptionStatus?.subscription_status ?? "none"
+          subscriptionStatus?.subscription_status ?? 'none'
         );
       }
       if (subscriptionError) {
@@ -68,10 +68,10 @@ const Navbar = () => {
                 isNavOpen ? styles.navLeftLinksMobile : styles.navLeftLinks
               }
             >
-              <Link href="/" className={styles.navLeftLink}>
+              <Link href='/' className={styles.navLeftLink}>
                 <Image
                   src={logo}
-                  alt="Budget Management Home Logo"
+                  alt='Budget Management Home Logo'
                   width={45}
                   height={45}
                   className={styles.logo}
@@ -86,9 +86,10 @@ const Navbar = () => {
                 isNavOpen ? styles.navRightLinksMobile : styles.navRightLinks
               }
             >
-              <Link href="/" className={styles.homeLink}>
+              <Link href='/' className={styles.homeLink}>
                 Home
               </Link>
+
               {user ? (
                 <>
                   <Link
@@ -99,8 +100,8 @@ const Navbar = () => {
                   >
                     Budget Management
                   </Link>
-                  {(subscriptionStatus === "active" ||
-                    subscriptionStatus === "trialing") &&
+                  {(subscriptionStatus === 'active' ||
+                    subscriptionStatus === 'trialing') &&
                     user && (
                       <>
                         <div className={styles.link}>
@@ -114,28 +115,35 @@ const Navbar = () => {
                       </>
                     )}
                   <div className={styles.linkSub}>
-                    {(subscriptionStatus === "none" ||
-                      subscriptionStatus === "" ||
-                      subscriptionStatus === "canceled" ||
+                    {(subscriptionStatus === 'none' ||
+                      subscriptionStatus === '' ||
+                      subscriptionStatus === 'canceled' ||
                       !subscriptionStatus) &&
                       user && <CheckoutButton />}
                   </div>
                   <div className={styles.link}>
-                    <Link href="/contact">Contact</Link>
+                    <Link href='/contact'>Contact</Link>
                   </div>
                   <div className={styles.link}>
                     <SignOutButton />
                   </div>
                 </>
               ) : (
-                <div className={styles.link}></div>
+                <>
+                  <div className={styles.link}>
+                    <Link href='/login'>Login</Link>
+                  </div>
+                  <div className={styles.link}>
+                    <Link href='/signup'>SignUp</Link>
+                  </div>
+                </>
               )}
             </div>
           </div>
 
           <div className={isNavOpen ? styles.burgerMobile : styles.burger}>
             <Hamburger
-              color="#fff"
+              color='#fff'
               size={25}
               toggle={toggleNav}
               toggled={isNavOpen}
