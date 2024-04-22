@@ -7,10 +7,12 @@ export async function GET(request: Request, { params }: any) {
     .from("budget")
     .select("*")
     .match({ month: parseInt(month), year: parseInt(year) });
-
-  return new Response(
-    JSON.stringify(
-      !budget[0] ? { year, month, income: 0.0, id: "" } : budget[0]
-    )
-  );
+  if (budget && budget[0]) {
+    return new Response(
+      JSON.stringify(
+        !budget[0] ? { year, month, income: 0.0, id: "" } : budget[0]
+      )
+    );
+  }
+  return new Response(JSON.stringify({ year, month, income: 0.0, id: "" }));
 }
