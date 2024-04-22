@@ -1,4 +1,5 @@
 "use client";
+import { DateTime } from "luxon";
 import { useQuery } from "@tanstack/react-query";
 import type { category } from "@/types/category";
 //import { categoriesAtom } from "@/types/atoms";
@@ -87,7 +88,9 @@ export default function AddTransaction({
         <DateInput
           label="Date"
           name="date"
-          defaultValue={new Date(transaction.date ?? "")}
+          defaultValue={DateTime.fromISO(transaction.date ?? "")
+            .toUTC()
+            .toJSDate()}
         />
         <NumericTextBox
           label="Amount"

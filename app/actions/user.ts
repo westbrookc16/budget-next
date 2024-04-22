@@ -2,7 +2,6 @@
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
-
 import { redirect } from "next/navigation";
 export async function getSubscriptionStatus() {
   const supabase = createClient();
@@ -35,7 +34,6 @@ export async function login(originalState: any, data: FormData) {
     console.log(JSON.stringify(error));
     return { message: error.message };
   }
-  revalidatePath("/", "layout");
   return redirect("/");
 }
 

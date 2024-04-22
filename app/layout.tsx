@@ -1,3 +1,4 @@
+import { createClient } from "@/utils/supabase/server";
 import Navbar from "@/components/Navbar";
 import { QueryProvider } from "@/components/queryprovider";
 
@@ -13,16 +14,24 @@ export const metadata: Metadata = {
 };
 
 import Footer from "@/components/footer/Footer";
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = createClient();
+  const { data, error } = await supabase.auth.getUser();
+  if (error) {
+    console.error(JSON.stringify(error));
+  }
+
   return (
     <QueryProvider>
       <html lang="en">
         <body className={nunito.className}>
-          <Navbar />
+          <nav>
+            <Navbar userProp={data?.user?.id ?? ""} />
+          </nav>
           <main>{children}</main>
           <Footer />
         </body>

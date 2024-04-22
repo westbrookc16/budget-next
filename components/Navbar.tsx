@@ -11,8 +11,8 @@ import { Fade as Hamburger } from "hamburger-react";
 import CheckoutButton from "./stripe-payment";
 import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
-const Navbar = () => {
-  const [user, setUser] = useState();
+const Navbar = ({ userProp }: { userProp: string }) => {
+  const [user, setUser] = useState<string>(userProp);
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [subscriptionStatus, setSubscriptionStatus] = useState("");
   useEffect(() => {
@@ -24,7 +24,7 @@ const Navbar = () => {
         return;
       }
       if (data.user) {
-        setUser(data.user);
+        setUser(data.user.id);
       }
       const { data: subscriptionStatus, error: subscriptionError } =
         await supabase.from("user_data").select("subscription_status").single();
@@ -32,9 +32,6 @@ const Navbar = () => {
         setSubscriptionStatus(
           subscriptionStatus?.subscription_status ?? "none"
         );
-      }
-      if (subscriptionError) {
-        console.error(JSON.stringify(subscriptionError));
       }
     }
     fetchUser();
@@ -45,7 +42,8 @@ const Navbar = () => {
     const sub = supabase.auth.onAuthStateChange((event, session) => {
       console.log(event);
       console.log(session);
-      setUser(session?.user?.id ?? null);
+
+      setUser(session?.user?.id ?? "");
     });
     return () => {
       sub.data.subscription.unsubscribe();
@@ -89,6 +87,7 @@ const Navbar = () => {
               <Link href="/" className={styles.homeLink}>
                 Home
               </Link>
+
               {user ? (
                 <>
                   <Link
@@ -105,7 +104,7 @@ const Navbar = () => {
                       <>
                         <div className={styles.link}>
                           <Link
-                            href={`${process.env.NEXT_PUBLIC_BASE_URL}api/create-portal-link/${user?.id}`}
+                            href={`${process.env.NEXT_PUBLIC_BASE_URL}api/create-portal-link/${user}`}
                             className={styles.link}
                           >
                             Manage Subscription
@@ -128,7 +127,14 @@ const Navbar = () => {
                   </div>
                 </>
               ) : (
-                <div className={styles.link}></div>
+                <>
+                  <div className={styles.link}>
+                    <Link href="/login">Login</Link>
+                  </div>
+                  <div className={styles.link}>
+                    <Link href="/signup">SignUp</Link>
+                  </div>
+                </>
               )}
             </div>
           </div>
