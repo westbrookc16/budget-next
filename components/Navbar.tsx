@@ -19,7 +19,7 @@ const Navbar = ({ userProp }: { userProp: string }) => {
   useEffect(() => {
     async function fetchUser() {
       const supabase = createClient();
-      const { data: session } = await supabase.auth.getSession();
+      /*const { data: session } = await supabase.auth.getSession();
       if (session.session) {
         await supabase.auth.setSession(session.session);
       }
@@ -30,7 +30,7 @@ const Navbar = ({ userProp }: { userProp: string }) => {
       }
       if (data.user) {
         setUser(data.user.id);
-      }
+      }*/
       const { data: subscriptionStatus, error: subscriptionError } =
         await supabase.from("user_data").select("subscription_status").single();
       if (subscriptionStatus) {
