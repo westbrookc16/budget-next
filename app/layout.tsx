@@ -25,7 +25,7 @@ export default async function RootLayout({
   if (error) {
     console.error(JSON.stringify(error));
   }
-  console.log(`layoutUser=${data?.user?.id}`);
+
   return (
     <QueryProvider>
       <html lang="en">
