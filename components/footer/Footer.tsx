@@ -39,7 +39,7 @@ const Footer = () => {
         <small className={styles.small}>
           &copy;2024 Chris WestBrook. All rights reserved.
         </small>
-        {isLoaded && isSignedIn && (
+        {isLoaded && isSignedIn && subscriptionStatus === "none" && (
           <div className={styles.link}>
             {(subscriptionStatus === "none" ||
               subscriptionStatus === "" ||
