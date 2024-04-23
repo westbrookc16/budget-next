@@ -11,6 +11,9 @@ export default function SignInButton({ text }: { text: string }) {
         console.log(`sign in`);
         const { error } = await supabase.auth.signInWithOAuth({
           provider: "google",
+          options: {
+            redirectTo: process.env.NEXT_PUBLIC_BASE_URL,
+          },
         });
         if (error) console.log("Error logging in:", error.message);
         //redirect("/");
@@ -20,4 +23,3 @@ export default function SignInButton({ text }: { text: string }) {
     </button>
   );
 }
-//whats is the difference making use of this button and  and the function in the user.ts?

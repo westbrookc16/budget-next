@@ -14,6 +14,7 @@ import { createClient } from "@/utils/supabase/client";
 const Navbar = ({ userProp }: { userProp: string }) => {
   const [user, setUser] = useState<string>(userProp);
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [subscriptionStatus, setSubscriptionStatus] = useState("");
   useEffect(() => {
     async function fetchUser() {
@@ -39,14 +40,13 @@ const Navbar = ({ userProp }: { userProp: string }) => {
       }
     }
     fetchUser();
+    setLoading(false);
   }, []);
 
   useEffect(() => {
     const supabase = createClient();
     const sub = supabase.auth.onAuthStateChange((event, session) => {
-      console.log(event);
-      console.log(session);
-
+      setLoading(false);
       setUser(session?.user?.id ?? "");
     });
     return () => {
@@ -58,6 +58,9 @@ const Navbar = ({ userProp }: { userProp: string }) => {
 
     console.log(isNavOpen);
   };
+  if (loading) {
+    return <div>Loading...</div>;
+  }
   return (
     <div>
       <div

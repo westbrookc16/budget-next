@@ -22,7 +22,10 @@ export async function login(originalState: any, data: FormData) {
   const password = data.get("password") as string;
   const _action = data.get("_action") as string;
   if (_action === "google") {
-    await supabase.auth.signInWithOAuth({ provider: "google" });
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: process.env.NEXT_PUBLIC_BASE_URL },
+    });
     return redirect("/");
   }
   const { error } = await supabase.auth.signInWithPassword({
