@@ -19,11 +19,11 @@ const Navbar = ({ userProp }: { userProp: string }) => {
   useEffect(() => {
     async function fetchUser() {
       const supabase = createClient();
-      const { data: session } = await supabase.auth.getSession();
+      /*const { data: session } = await supabase.auth.getSession();
       if (session.session) {
         await supabase.auth.setSession(session.session);
       }
-      /*const { data, error } = await supabase.auth.getUser();
+      const { data, error } = await supabase.auth.getUser();
       if (error) {
         console.error(JSON.stringify(error));
         return;

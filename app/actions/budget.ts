@@ -44,6 +44,14 @@ export async function updateBudget(initialState: any, data: FormData) {
           .from("budget")
           .update({ income })
           .match({ id: budgetId });
+        //}
+        if (error) {
+          Sentry.captureException(error);
+          return {
+            message: "An error occurred. Please try again.",
+            timestamp: new Date(),
+          };
+        }
       }
       return {
         message: "Your budget was updated successfully.",
