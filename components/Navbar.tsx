@@ -47,12 +47,13 @@ const Navbar = ({ userProp }: { userProp: string }) => {
     const supabase = createClient();
     const sub = supabase.auth.onAuthStateChange((event, session) => {
       setLoading(false);
-      setUser(session?.user?.id ?? "");
+      if (event !== "SIGNED_OUT") setUser(session?.user?.id ?? userProp);
+      else setUser("");
     });
     return () => {
       sub.data.subscription.unsubscribe();
     };
-  }, []);
+  }, [userProp]);
   const toggleNav = () => {
     setIsNavOpen(!isNavOpen);
 
@@ -61,6 +62,7 @@ const Navbar = ({ userProp }: { userProp: string }) => {
   if (loading) {
     return <div>Loading...</div>;
   }
+  console.log(`navUser=${user}`);
   return (
     <div>
       <div
