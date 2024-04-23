@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { createClient } from "@/utils/supabase/server";
+
 import Navbar from "@/components/Navbar";
 import { QueryProvider } from "@/components/queryprovider";
 
