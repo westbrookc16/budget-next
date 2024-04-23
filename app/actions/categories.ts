@@ -33,7 +33,12 @@ export async function updateCategory(initialState: any, data: FormData) {
 
   try {
     if (action === "delete") {
-      await supabase.from("category").delete().match({ id });
+      const { error } = await supabase.from("category").delete().match({ id });
+      if (error) {
+        sentry.captureException(error);
+        console.log(JSON.stringify(error));
+        return { message: "There was an error." };
+      }
       //return success message
       return { message: "Your category was deleted successfully." };
     }
