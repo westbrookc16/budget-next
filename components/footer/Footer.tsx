@@ -14,6 +14,11 @@ const Footer = () => {
   >("none");
   useEffect(() => {
     async function fetchSubscriptionStatus() {
+      const { data: session } = await supabase.auth.getSession();
+      if (session.session) {
+        await supabase.auth.setSession(session.session);
+      }
+
       const status = await getSubscriptionStatus();
       setSubscriptionStatus(status || "none");
     }
