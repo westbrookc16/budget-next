@@ -68,7 +68,7 @@ export async function signup(originalState: any, data: FormData) {
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: { emailRedirectTo: `${origin}/auth/callback` },
+      options: { emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}` },
     });
     if (error) {
       console.log(JSON.stringify(error));
