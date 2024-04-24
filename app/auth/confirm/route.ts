@@ -24,7 +24,12 @@ export async function GET(request: NextRequest) {
     });
     if (!error) {
       redirectTo.searchParams.delete("next");
-      return NextResponse.redirect(process.env.NEXT_PUBLIC_BASE_URL!);
+      if (type === "email") {
+        return NextResponse.redirect(process.env.NEXT_PUBLIC_BASE_URL!);
+      }
+      return NextResponse.redirect(
+        `${process.env.NEXT_PUBLIC_BASE_URL!}auth/reset`
+      );
     }
   }
 

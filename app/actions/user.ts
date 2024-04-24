@@ -21,25 +21,27 @@ export async function login(originalState: any, data: FormData) {
   const email = data.get("email") as string;
   const password = data.get("password") as string;
   const _action = data.get("_action") as string;
-  if (_action === "google") {
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: process.env.NEXT_PUBLIC_BASE_URL },
+  if (_action === "login") {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
+
+    if (error) {
+      console.log(JSON.stringify(error));
+      return { message: error.message };
+    }
     return redirect("/");
+  } else {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL!}auth/confirm`,
+    });
+    if (error) {
+      console.log(JSON.stringify(error));
+      return { message: error.message };
+    }
   }
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (error) {
-    console.log(JSON.stringify(error));
-    return { message: error.message };
-  }
-  return redirect("/");
 }
-
 export async function signup(originalState: any, data: FormData) {
   const _action = data.get("_action") as string;
   const email = data.get("email") as string;
@@ -74,4 +76,19 @@ export async function signup(originalState: any, data: FormData) {
     }
     return { message: "Check email to continue sign in process" };
   }
+}
+export async function updatePassword(originalState: any, data: FormData) {
+  const supabase = createClient();
+  const origin = headers().get("origin");
+  const password = data.get("password") as string;
+  const confirmPassword = data.get("confirmPassword") as string;
+  if (password !== confirmPassword) {
+    return { message: "Passwords do not match" };
+  }
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) {
+    console.log(JSON.stringify(error));
+    return { message: error.message };
+  }
+  return redirect("/");
 }
