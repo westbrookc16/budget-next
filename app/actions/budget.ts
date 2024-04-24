@@ -78,6 +78,46 @@ export async function updateBudget(initialState: any, data: FormData) {
       if (!previousMonth || !previousYear || !userId) {
         return { message: "No action taken.", timestamp: new Date() };
       }
+      //get the categories from the previous month
+      const { data: prevBudget } = await supabase
+        .from("budget")
+        .select("id")
+        .eq("month", previousMonth)
+        .eq("year", previousYear)
+        .eq("user_id", userId)
+        .single();
+      if (!prevBudget) {
+        return { message: "No action taken.", timestamp: new Date() };
+      }
+      const prevBudgetId = prevBudget.id;
+      //get the categories from the previous month
+      const { data: prevCategories } = await supabase
+        .from("category")
+        .select("*")
+        .eq("budget_id", prevBudgetId)
+        .eq("is_recurring", true);
+      if (!prevCategories) {
+        return { message: "No action taken.", timestamp: new Date() };
+      }
+      //add the categories to the current month
+      for (let i = 0; i < prevCategories.length; i++) {
+        const { data: resCategory, error } = await supabase
+          .from("category")
+          .insert({
+            name: prevCategories[i].name,
+            amount: prevCategories[i].amount,
+            is_recurring: true,
+            budget_id: +budgetId,
+            user_id: userId,
+          });
+        if (error) {
+          Sentry.captureException(error);
+          return {
+            message: "An error occurred. Please try again.",
+            timestamp: new Date(),
+          };
+        }
+      }
     } catch (error) {
       Sentry.captureException(error);
       return {
