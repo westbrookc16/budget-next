@@ -200,7 +200,8 @@ export default function HandleBudgetPage() {
 
       budgetInfo.refetch();
       //refresh the categories
-      if (formState.message.includes("categories") && success) {
+      if (formState.message.includes("categories")) {
+        console.log(`refetching categories.`);
         catInfo.refetch();
       }
 
