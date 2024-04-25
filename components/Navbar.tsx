@@ -37,7 +37,10 @@ const Navbar = ({ userProp }: { userProp: string }) => {
     const sub = supabase.auth.onAuthStateChange((event, session) => {
       setLoading(false);
       if (event !== "SIGNED_OUT") setUser(session?.user?.id ?? userProp);
-      else setUser("");
+      else {
+        setUser("");
+        setSubscriptionStatus("none");
+      }
     });
     return () => {
       sub.data.subscription.unsubscribe();
