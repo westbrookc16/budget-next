@@ -26,7 +26,7 @@ const Navbar = ({ userProp }: { userProp: string }) => {
         setSubscriptionStatus(
           subscriptionStatus?.subscription_status ?? "none"
         );
-      }
+      } else setSubscriptionStatus("none");
     }
     fetchUser();
     setLoading(false);
