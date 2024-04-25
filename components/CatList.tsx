@@ -54,7 +54,7 @@ export default function CatList({ budgetID, cats, refreshGrid }: any) {
     const isRecurring = props.dataItem[props.field ?? ""];
     return (
       <td {...props.tdProps} colSpan={1}>
-        <Checkbox disabled checked={isRecurring} />
+        <Checkbox disabled checked={isRecurring} label="Is Recurring" />
       </td>
     );
   };
