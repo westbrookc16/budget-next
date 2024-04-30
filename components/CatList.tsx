@@ -18,9 +18,7 @@ import Link from "next/link";
 
 export default function CatList({ budgetID, cats, refreshGrid }: any) {
   //const { user } = useUser();
-  const [subscriptionStatus, setSubscriptionStatus] = useState<
-    string | Response
-  >("none");
+  const [subscriptionStatus, setSubscriptionStatus] = useState<string>("none");
 
   useEffect(() => {
     async function getData() {

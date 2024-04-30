@@ -20,7 +20,7 @@ export async function getCategoriesByMonthYear(month: number, year: number) {
       .select("*")
       .match({ budget_id: res });
     console.log(res2.error);
-    return res2.data;
+    return res2.data ?? [];
   } catch (e) {
     sentry.captureException(e);
     return [];

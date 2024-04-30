@@ -1,16 +1,13 @@
-"use client";
+import MonthComponent from "@/components/footer/monthComponent";
+import { refreshBudgetByUrl } from "@/app/actions/budget";
+import SubmitButton from "@/components/submitButton";
+import CopyMonthsButton from "@/components/copyCatButton";
+import { refreshBudget } from "@/app/actions/budget";
+
+import { getBudget } from "@/app/actions/budget";
 import { getCategoriesByMonthYear } from "@/app/actions/categories";
 import * as sentry from "@sentry/nextjs";
 import type { Metadata } from "next";
-
-/*import {
-  isActiveAtom,
-  loadingAtom,
-  refreshDateAtom,
-  budgetAtom,
-  categoriesAtom,
-  totalAtom,
-} from "@/types/atoms";*/
 
 import { Fade } from "@progress/kendo-react-animation";
 import { useQuery } from "@tanstack/react-query";
@@ -19,18 +16,16 @@ import {
   NotificationGroup,
 } from "@progress/kendo-react-notification";
 import { updateBudget } from "@/app/actions/budget";
-import { useFormState, useFormStatus } from "react-dom";
-import { useParams } from "next/navigation";
-import { useRouter } from "next/navigation";
+
 import { DropDownList } from "@progress/kendo-react-dropdowns";
-import { useEffect, useState } from "react";
+
 import CatList from "@/components/CatList";
 import { NumericTextBox } from "@progress/kendo-react-inputs";
 
 import Loader from "@/common/Loader";
 import { budget } from "@/types/budget";
 import { category } from "@/types/category";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/utils/supabase/server";
 import { Database, Tables } from "@/types/supabase";
 import { getSubscriptionStatus } from "@/app/actions/user";
 
@@ -39,41 +34,24 @@ import { getSubscriptionStatus } from "@/app/actions/user";
   const { month, year } = params;
   return { title: `Budget for ${month}/${year}` };
 }*/
-export default function HandleBudgetPage() {
-  //use global state context
-  const [user, setUser] = useState({});
+export default async function HandleBudgetPage({
+  params,
+  searchParams,
+}: {
+  params: { month: string; year: string };
+  searchParams: { message: string };
+}) {
   const supabase = createClient();
-  useEffect(() => {
-    async function fetchUser() {
-      const { data } = await supabase.auth.getUser();
-      if (data.user) {
-        setUser(data.user);
-      }
-    }
-    fetchUser();
-  }, [supabase.auth]);
-  const [subscriptionStatus, setSubscriptionStatus] = useState<
-    string | Response
-  >("");
-  useEffect(() => {
-    async function fetchSubscriptionStatus() {
-      const subStatus = await getSubscriptionStatus();
-      setSubscriptionStatus(subStatus ?? "none");
-    }
-    fetchSubscriptionStatus();
-  }, []);
+
+  const subscriptionStatus = await getSubscriptionStatus();
+
   const isActive =
     subscriptionStatus === "active" || subscriptionStatus === "trialing";
-  const [income, setIncome] = useState<number>(0);
-  const { month, year } = useParams();
 
-  const budgetInfo = useQuery({
-    queryKey: ["budget", month, year],
-    queryFn: () => {
-      return getBudget(month as string, year as string);
-    },
-  });
-  const budget = budgetInfo.data as budget;
+  const { month, year } = params;
+
+  const budget = await getBudget(month, year);
+  //const budget = budgetInfo.data as budget;
   const getCategories = async (budgetId: string) => {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}api/categories/${budgetId}`
@@ -86,147 +64,16 @@ export default function HandleBudgetPage() {
 
     enabled: !!budget?.id,
   });*/
-  const catInfo = useQuery({
-    queryKey: ["categories", month, year],
-    queryFn: async () => {
-      return getCategoriesByMonthYear(
-        parseInt(month as string),
-        parseInt(year as string)
-      );
-    },
-  });
 
-  useEffect(() => {
-    setIncome(budget?.income ?? 0);
-  }, [budget]);
   const cats: Tables<"category_with_total_spent">[] =
-    catInfo.data as Tables<"category_with_total_spent">[];
+    await getCategoriesByMonthYear(+month, +year);
 
   const total = cats?.reduce((acc, cat) => acc + (cat.amount ?? 0), 0) ?? 0;
 
-  const loading = budgetInfo.isFetching || catInfo.isFetching;
+  const loading = false;
   //const loading = false;
   //const [loading, setLoading] = useAtom(loadingAtom);
   //const [refreshDate, setRefreshDate] = useAtom(refreshDateAtom);
-  const SubmitButton = () => {
-    const { pending } = useFormStatus();
-    return (
-      <button
-        type="submit"
-        value={pending ? "Submitting" : "Submit"}
-        disabled={pending}
-        className="bg-blue-600 h-9 w-100 text-sm p-2 rounded text-white mt-4 cursor-pointer hover:bg-blue-700 transition transition-duration: 500ms;"
-        name="submit"
-      >
-        Submit
-      </button>
-    );
-  };
-  const CopyMonthsButton = () => {
-    const { pending } = useFormStatus();
-    return (
-      <button
-        type="submit"
-        value="Copy Categories from Previous Month"
-        disabled={pending}
-        className="bg-blue-600 h-9 w-100 text-sm p-2 rounded text-white mt-4 cursor-pointer hover:bg-blue-700 transition transition-duration: 500ms;"
-        name="submit"
-      >
-        Copy Categories from Previous Month
-      </button>
-    );
-  };
-
-  const initialState: any = { message: "" };
-  const [formState, formAction] = useFormState(updateBudget, initialState);
-
-  const router = useRouter();
-
-  const [realMonth, setRealMonth] = useState(month);
-
-  const months = [
-    { name: "Jan", value: 1 },
-    { name: "Feb", value: 2 },
-    { name: "Mar", value: 3 },
-    { name: "Apr", value: 4 },
-    { name: "May", value: 5 },
-    { name: "Jun", value: 6 },
-    { name: "Jul", value: 7 },
-    { name: "Aug", value: 8 },
-    { name: "Sep", value: 9 },
-    { name: "Oct", value: 10 },
-    { name: "Nov", value: 11 },
-    { name: "Dec", value: 12 },
-  ];
-  const [ddlMonth, setDdlMonth] = useState(
-    months.filter((v) => v.value === parseInt(month.toString()))[0]
-  );
-  const [ddlYear, setDdlYear] = useState<string>(year.toString());
-
-  const changeBudget = (e: any) => {
-    if (e.target.name === "month") {
-      setRealMonth(e.target.value.value);
-      setDdlMonth(e.target.value);
-      //router.push(`/budget/${e.target.value.value}/${ddlYear}`);
-    } else {
-      setDdlYear(e.target.value);
-      //router.push(`/budget/${realMonth}/${e.target.value}`);
-    }
-  };
-  useEffect(() => {
-    document.title = `Budget for ${month}/${year}`;
-  }, [month, year]);
-  const selectBudget = () => {
-    router.push(`/budget/${realMonth}/${ddlYear}`);
-  };
-  const [success, setSuccess] = useState<boolean>(false);
-
-  const [totalLeft, setTotalLeft] = useState<number>(0);
-  const [refreshBudget, setRefreshBudget] = useState<Date>(new Date());
-
-  /*useEffect(() => {
-    if (!budget) return;
-    setTotalLeft(budget.income - Number(total));
-  }, [budget, cats, total]);*/
-
-  useEffect(() => {
-    if (
-      "message" in formState &&
-      formState.message &&
-      !budgetInfo.isFetching &&
-      !catInfo.isFetching
-    ) {
-      setSuccess(true);
-
-      budgetInfo.refetch();
-      //refresh the categories
-      if (formState.message.includes("categories")) {
-        console.log(`refetching categories.`);
-        catInfo.refetch();
-      }
-
-      //clear the message after 5 seconds
-      setTimeout(() => {
-        setSuccess(false);
-      }, 5000);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formState]);
-  const getBudget = async (month: string, year: string) => {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}api/budget/${month}/${year}`
-    );
-    return response.json();
-  };
-
-  /*if (loading) {
-    return (
-      //implement a loader
-      <div className="flex justify-center items-center mt-80">
-        <Loader />
-      </div>
-    );
-  }*/
 
   return (
     <div className=" h-screen">
@@ -235,43 +82,24 @@ export default function HandleBudgetPage() {
       </h1>
       <div className=" flex justify-center items-center p-5">
         <form
-          action={formAction}
+          action={updateBudget}
           id="budgetForm"
           className="flex justify-center item-center gap-6 text-lg font-semibold"
         >
-          <DropDownList
-            id="ddlMonth"
-            name="month"
-            value={ddlMonth}
-            onChange={changeBudget}
-            data={months}
-            textField="name"
-            dataItemKey="value"
-            label="Month"
-          />
-          <input
-            type="hidden"
-            id="realMonth"
-            name="realMonth"
-            value={realMonth}
-          />
+          <MonthComponent month={+month} />
           <DropDownList
             id="ddlYear"
             name="year"
             data={["2024", "2025", "2026"]}
-            value={ddlYear}
-            onChange={changeBudget}
+            defaultValue={year}
             label="Year"
           />
-          <button onClick={selectBudget}>Select</button>
+          <button formAction={refreshBudget}>Select</button>
           <NumericTextBox
             id="income"
             format="c2"
             name="income"
-            value={income ?? 0}
-            onChange={(e) => {
-              setIncome(e.value ?? 0);
-            }}
+            defaultValue={budget.income ?? 0}
             label="Income"
           />
           <input type="hidden" name="budgetId" value={budget?.id || ""} />
@@ -289,15 +117,12 @@ export default function HandleBudgetPage() {
           }}
         >
           <Fade>
-            {success && (
+            {searchParams.message && (
               <Notification
                 type={{ style: "success", icon: true }}
                 closable={false}
-                onClose={() => {
-                  setSuccess(false);
-                }}
               >
-                {formState?.message}
+                {searchParams.message}
               </Notification>
             )}
           </Fade>
@@ -308,7 +133,10 @@ export default function HandleBudgetPage() {
           <CatList
             budgetID={budget?.id}
             cats={cats}
-            refreshGrid={catInfo.refetch}
+            refreshGrid={async () => {
+              "use server";
+              await refreshBudgetByUrl(month, year);
+            }}
           />
         )}
       </div>
