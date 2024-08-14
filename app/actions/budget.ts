@@ -136,7 +136,8 @@ export async function getBudget(month: string, year: string) {
     .single();
   if (error) {
     Sentry.captureException(error);
-    return redirect(`/budget/${month}/${year}?message=${error.message}`);
+    return { month, year, income: 0, id: "" };
+    //return redirect(`/budget/${month}/${year}?message=${error.message}`);
   }
   return data;
 }
